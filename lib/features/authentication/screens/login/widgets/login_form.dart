@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:utrack/features/authentication/screens/home/home_page.dart';
+import 'package:utrack/features/app_pages/home/home_page.dart';
 import 'package:utrack/features/authentication/screens/signup/signup.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
 import 'package:utrack/utils/formatters/icons.dart';
