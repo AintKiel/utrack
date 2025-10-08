@@ -6,8 +6,8 @@ class UTextFieldTheme {
   UTextFieldTheme._();
 
   static InputDecorationTheme lightInputDecorationTheme = InputDecorationTheme(
-    filled: true,
-    fillColor: UColors.light.background.withOpacity(0.5),
+    filled: false,
+    fillColor: Colors.transparent,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(Usizes.inputFieldRadius),
       borderSide: BorderSide(color: UColors.light.primary),
@@ -21,8 +21,8 @@ class UTextFieldTheme {
   );
 
   static InputDecorationTheme darkInputDecorationTheme = InputDecorationTheme(
-    filled: true,
-    fillColor: UColors.dark.background.withOpacity(0.5),
+    filled: false,
+    fillColor: Colors.transparent,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(Usizes.inputFieldRadius),
       borderSide: BorderSide(color: UColors.dark.primary),

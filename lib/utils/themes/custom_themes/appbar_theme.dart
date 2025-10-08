@@ -7,7 +7,7 @@ class UAppBarTheme {
 
   static AppBarTheme lightAppBarTheme = AppBarTheme(
     elevation: 0,
-    backgroundColor: UColors.light.background,
+    backgroundColor: Colors.white70,
     foregroundColor: UColors.light.text,
     centerTitle: false,
     titleTextStyle: TextStyle(
@@ -19,7 +19,7 @@ class UAppBarTheme {
 
   static AppBarTheme darkAppBarTheme = AppBarTheme(
     elevation: 0,
-    backgroundColor: UColors.dark.background,
+    backgroundColor: Colors.black38,
     foregroundColor: UColors.dark.text,
     centerTitle: false,
     titleTextStyle: TextStyle(

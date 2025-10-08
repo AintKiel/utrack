@@ -10,6 +10,8 @@ class UColors {
   // Neutral Greys (usable in both modes)
   static const Color grey = Color(0xFF9E9E9E);      // Standard grey
   static const Color darkGrey = Color(0xFF424242);  // Darker grey
+  static const Color white = Colors.white;          // white
+  static const Color black = Colors.black;          // black
 }
 
 class _LightColors {

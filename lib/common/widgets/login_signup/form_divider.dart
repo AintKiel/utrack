@@ -17,9 +17,9 @@ class UFormDivider extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Flexible(child: Divider(color: dark ?  UColors.darkGrey : UColors.grey, thickness: 0.5, indent: 60, endIndent: 5)),
+        Flexible(child: Divider(color: dark ?  UColors.darkGrey : UColors.grey, thickness: 1, indent: 60, endIndent: 5)),
         Text(dividerText, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: dark ? UColors.grey : UColors.darkGrey,),),
-        Flexible(child: Divider(color: dark ?  UColors.darkGrey : UColors.grey, thickness: 0.5, indent: 5, endIndent: 60)),
+        Flexible(child: Divider(color: dark ?  UColors.darkGrey : UColors.grey, thickness: 1, indent: 5, endIndent: 60)),
       ],
     );
   }
