@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:utrack/utils/constants/colors.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
+import 'package:utrack/features/authentication/screens/signup/verify_email.dart';
 
 
 class USignup_Form extends StatelessWidget {
   const USignup_Form({
-    super.key,
-    required this.dark,
+    super.key, required this.dark
   });
 
   final bool dark;
@@ -24,9 +25,7 @@ class USignup_Form extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   expands: false,
-                  decoration: InputDecoration(
-                    labelText: UTexts.firstName,
-                    prefixIcon: UIcons.user(),
+                  decoration: InputDecoration(labelText: UTexts.firstName, prefixIcon: UIcons.user(),
                   ),
                 ),
               ),
@@ -34,9 +33,7 @@ class USignup_Form extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   expands: false,
-                  decoration: InputDecoration(
-                    labelText: UTexts.lastName,
-                    prefixIcon: UIcons.user(),
+                  decoration: InputDecoration(labelText: UTexts.lastName, prefixIcon: UIcons.user(),
                   ),
                 ),
               ),
@@ -47,9 +44,7 @@ class USignup_Form extends StatelessWidget {
           /// Username
           TextFormField(
             expands: false,
-            decoration: InputDecoration(
-              labelText: UTexts.username,
-              prefixIcon: UIcons.userEdit(),
+            decoration: InputDecoration(labelText: UTexts.username, prefixIcon: UIcons.userEdit(),
             ),
           ),
           const SizedBox(height: Usizes.spaceBtwInputField),
@@ -57,9 +52,7 @@ class USignup_Form extends StatelessWidget {
           /// Email
           TextFormField(
             expands: false,
-            decoration: InputDecoration(
-              labelText: UTexts.email,
-              prefixIcon: UIcons.mail(),
+            decoration: InputDecoration(labelText: UTexts.email, prefixIcon: UIcons.mail(),
             ),
           ),
           const SizedBox(height: Usizes.spaceBtwInputField),
@@ -67,9 +60,7 @@ class USignup_Form extends StatelessWidget {
           /// Phone Number
           TextFormField(
             expands: false,
-            decoration: InputDecoration(
-              labelText: UTexts.phoneNo,
-              prefixIcon: UIcons.phone(),
+            decoration: InputDecoration(labelText: UTexts.phoneNo, prefixIcon: UIcons.phone(),
             ),
           ),
           const SizedBox(height: Usizes.spaceBtwInputField),
@@ -77,10 +68,7 @@ class USignup_Form extends StatelessWidget {
           /// Password
           TextFormField(
             obscureText: true,
-            decoration: InputDecoration(
-              labelText: UTexts.password,
-              prefixIcon: UIcons.password(),
-              suffixIcon: UIcons.visibilityOff(),
+            decoration: InputDecoration(labelText: UTexts.password, prefixIcon: UIcons.password(), suffixIcon: UIcons.visibilityOff(),
             ),
           ),
           const SizedBox(height: Usizes.spaceBtwSections),
@@ -89,10 +77,7 @@ class USignup_Form extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: Checkbox(value: true, onChanged: (value) {}),
+              SizedBox(width: 24, height: 24, child: Checkbox(value: true, onChanged: (value) {}),
               ),
               const SizedBox(width: Usizes.spaceBtwItems),
               Expanded(
@@ -100,17 +85,13 @@ class USignup_Form extends StatelessWidget {
                   TextSpan(
                     children: [
                       TextSpan(
-                        text: '${UTexts.iAgreeto} ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).brightness == Brightness.dark
+                        text: '${UTexts.iAgreeto} ', style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark
                               ? UColors.grey
                               : UColors.darkGrey,
                         ),
                       ),
                       TextSpan(
-                        text: UTexts.privacyPolicy,
-                        style: Theme.of(context).textTheme.bodyMedium!.apply(
+                        text: UTexts.privacyPolicy, style: Theme.of(context).textTheme.bodyMedium!.apply(
                           color: dark
                               ? UColors.dark.primary
                               : UColors.light.accent,
@@ -122,9 +103,7 @@ class USignup_Form extends StatelessWidget {
                       ),
                       TextSpan(
                         text: ' and ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).brightness == Brightness.dark
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark
                               ? UColors.grey
                               : UColors.darkGrey,
                         ),
@@ -150,15 +129,10 @@ class USignup_Form extends StatelessWidget {
           const SizedBox(height: Usizes.spaceBtwSections),
 
           /// Sign Up Button
-          SizedBox(
-            width: double.infinity,
-            height: 50,
+          SizedBox(width: double.infinity, height: 50,
             child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                foregroundColor: UColors.light.background,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+              onPressed: () => Get.to(() => const VerifyEmailScreen()),
+              style: ElevatedButton.styleFrom(foregroundColor: UColors.light.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30),
                 ),
               ),
               child: Text(UTexts.createAccount),

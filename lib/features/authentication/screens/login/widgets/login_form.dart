@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:utrack/features/authentication/screens/home/home_page.dart';
 import 'package:utrack/features/authentication/screens/signup/signup.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
 import 'package:utrack/utils/formatters/icons.dart';
@@ -50,7 +51,7 @@ class ULoginForm extends StatelessWidget {
             const SizedBox(height: Usizes.spaceBtwSections),
 
             ///Sign In Button
-            SizedBox(width: double.infinity, height: 50, child: ElevatedButton(onPressed: () {},
+            SizedBox(width: double.infinity, height: 50, child: ElevatedButton(onPressed: () => Get.to(() => const HomePageScreen()),
               style: ElevatedButton.styleFrom(foregroundColor: UColors.light.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
               child: Text(UTexts.signIn),),),
             const SizedBox(height: Usizes.spaceBtwItems * 1.1),
