@@ -9,4 +9,10 @@ class UImages {
 
   // -- Send Email Image
   static const String sendEmailImage = "assets/images/send_email.png";
+
+  //
+  static const String idVerifyImage = "assets/images/id_verify.png";
+  static const String idUploadImage = "assets/images/id_alt.png";
+  static const String idScanImage = "assets/images/camera_alt.png";
+  static const String createdImage = "assets/images/created.png";
 }

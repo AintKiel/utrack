@@ -41,14 +41,6 @@ class USignup_Form extends StatelessWidget {
           ),
           const SizedBox(height: Usizes.spaceBtwInputField * 1.1),
 
-          /// Username
-          TextFormField(
-            expands: false,
-            decoration: InputDecoration(labelText: UTexts.username, prefixIcon: UIcons.userEdit(),
-            ),
-          ),
-          const SizedBox(height: Usizes.spaceBtwInputField),
-
           /// Email
           TextFormField(
             expands: false,
@@ -61,6 +53,14 @@ class USignup_Form extends StatelessWidget {
           TextFormField(
             expands: false,
             decoration: InputDecoration(labelText: UTexts.phoneNo, prefixIcon: UIcons.phone(),
+            ),
+          ),
+          const SizedBox(height: Usizes.spaceBtwInputField),
+
+          /// Address
+          TextFormField(
+            expands: false,
+            decoration: InputDecoration(labelText: UTexts.address, prefixIcon: UIcons.location(),
             ),
           ),
           const SizedBox(height: Usizes.spaceBtwInputField),

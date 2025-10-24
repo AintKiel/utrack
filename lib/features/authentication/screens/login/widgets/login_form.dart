@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:utrack/features/app_pages/home/home_page.dart';
+import 'package:utrack/features/authentication/screens/login/forgetpass/forgetPassValidEmail.dart';
 import 'package:utrack/features/authentication/screens/signup/signup.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
 import 'package:utrack/utils/formatters/icons.dart';
@@ -45,7 +46,7 @@ class ULoginForm extends StatelessWidget {
                   ],
                 ),
                 ///forget pass
-                TextButton(onPressed: (){}, child: Text(UTexts.forgetPassword),)
+                TextButton(onPressed: () => Get.to(() => const ForgetPassEmail()), child: Text(UTexts.forgetPassword),)
               ],
             ),
             const SizedBox(height: Usizes.spaceBtwSections),

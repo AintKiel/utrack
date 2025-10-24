@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// App Logos & Social Media Icons
 class ULogos {
   // App Logos
@@ -10,6 +8,7 @@ class ULogos {
   static const String google = "assets/images/google.png";
   static const String facebook = "assets/images/facebook.png";
   static const String sendEmail = "assets/images/send_email.png";
+  static const String verifyID = "assets/images/id_verify.png";
 }
 
 /// Logo Sizes (for consistent scaling)
@@ -22,7 +21,8 @@ class ULogoSizes {
   static const double socialLogoSize = 48;  // For Google / Facebook buttons
 
   // Send Email Logo (like splashscreen size)
-  static const double sendEmailSize = 120;
+  static const double onBoardSize = 250;
+  static const double idUploadSize = 32;
 }
 
 /// Example Usage
