@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:utrack/features/authentication/screens/login/forgetpass/newPassCreated.dart';
-import 'package:utrack/features/authentication/screens/login/login.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/constants/text_strings.dart';

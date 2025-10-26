@@ -19,6 +19,7 @@ class _LightColors {
   final Color primary = const Color(0xFF26667F);
   final Color secondary = const Color(0xFF67C090);
   final Color accent = const Color(0xFF124170);
+  final Color darkGrey = Color(0xFF424242);
   final Color text = Colors.black87;
 }
 
@@ -27,5 +28,6 @@ class _DarkColors {
   final Color primary = const Color(0xFF26667F);
   final Color secondary = const Color(0xFF67C090);
   final Color accent = const Color(0xFFDDF4E7);
+  final Color grey = Color(0xFF9E9E9E);
   final Color text = Colors.white70;
 }

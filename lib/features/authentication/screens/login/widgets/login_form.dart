@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:utrack/features/app_pages/home/home_page.dart';
 import 'package:utrack/features/authentication/screens/login/forgetpass/forgetPassValidEmail.dart';
 import 'package:utrack/features/authentication/screens/signup/signup.dart';
+import 'package:utrack/navigation_menu.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
@@ -52,7 +53,7 @@ class ULoginForm extends StatelessWidget {
             const SizedBox(height: Usizes.spaceBtwSections),
 
             ///Sign In Button
-            SizedBox(width: double.infinity, height: 50, child: ElevatedButton(onPressed: () => Get.to(() => const HomePageScreen()),
+            SizedBox(width: double.infinity, height: 50, child: ElevatedButton(onPressed: () => Get.to(() => const NavigationMenu()),
               style: ElevatedButton.styleFrom(foregroundColor: UColors.light.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
               child: Text(UTexts.signIn),),),
             const SizedBox(height: Usizes.spaceBtwItems * 1.1),
