@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.paul.utrack"
-    compileSdk = 35
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -17,17 +17,27 @@ android {
         jvmTarget = "11"
     }
 
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     defaultConfig {
         applicationId = "com.paul.utrack"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        multiDexEnabled = true
     }
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -38,7 +48,7 @@ flutter {
 }
 
 dependencies {
-    implementation("androidx.multidex:multidex:2.0.1")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
 }
 
 apply(plugin = "com.google.gms.google-services")

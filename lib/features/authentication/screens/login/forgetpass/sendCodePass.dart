@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:utrack/features/authentication/screens/login/login.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
+import 'package:utrack/features/authentication/screens/login/forgetpass/forgetPassValidEmail.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
 import 'package:utrack/utils/helpers/helper_functions.dart';
 import 'package:utrack/utils/themes/custom_themes/sizes.dart';
-import 'package:get/get.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:utrack/utils/constants/image_strings.dart';
 import 'package:utrack/utils/constants/colors.dart';
-import 'package:utrack/features/authentication/screens/signup/id_validation.dart';
 import 'package:utrack/features/authentication/controllers/authentication_controller.dart';
 
-class VerifyEmailScreen extends StatefulWidget {
-  const VerifyEmailScreen({super.key});
+class ForgetPassVerifyEmailScreen extends StatefulWidget {
+  const ForgetPassVerifyEmailScreen({super.key});
 
   @override
-  State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
+  State<ForgetPassVerifyEmailScreen> createState() =>
+      _ForgetPassVerifyEmailScreenState();
 }
 
-class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
+class _ForgetPassVerifyEmailScreenState
+    extends State<ForgetPassVerifyEmailScreen> {
   final List<TextEditingController> _controllers =
   List.generate(6, (index) => TextEditingController());
   final _authController = AuthenticationController.instance;
@@ -31,16 +32,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     super.dispose();
   }
 
-  /// Get the complete 6-digit code
   String _getCompleteCode() {
     return _controllers.map((c) => c.text).join();
   }
 
-  /// Verify the 6-digit code
   Future<void> _verifyCode() async {
     String code = _getCompleteCode();
 
-    // Check if all 6 digits are entered
     if (code.length != 6) {
       Get.snackbar(
         'Error',
@@ -55,24 +53,21 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     setState(() => _isVerifying = true);
 
     try {
-      // Verify the code with controller
-      bool isValid = await _authController.verifyCodeFromUser(code);
+      bool isValid = await _authController.verifyPasswordResetCode(code);
 
       if (isValid) {
         Get.snackbar(
           'Success',
-          'Email verified successfully!',
+          'Code verified! Sending password reset email...',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
           duration: const Duration(seconds: 2),
         );
 
-        // Save user data after email verification
-        await _authController.savePendingUserDataAfterVerification();
-
-        // Navigate to ID validation screen
-        Get.to(() => const IdValidationScreen());
+        // Call the new method that sends the password reset email
+        // and goes to login page (no more createNewPass screen)
+        await _authController.sendPasswordResetEmailAfterVerification();
       }
     } catch (e) {
       Get.snackbar(
@@ -87,7 +82,6 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     }
   }
 
-  /// Clear all code fields
   void _clearCode() {
     for (var controller in _controllers) {
       controller.clear();
@@ -98,14 +92,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   @override
   Widget build(BuildContext context) {
     final dark = UHelperFunctions.isDarkMode(context);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            onPressed: () => Get.offAll(() => const LoginScreen()),
+            onPressed: () => Get.offAll(() => const ForgetPassEmail()),
             icon: const Icon(CupertinoIcons.clear),
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -114,7 +109,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image
+              /// 📩 Image Section
               Image(
                 image: const AssetImage("assets/images/send_email.png"),
                 height: ULogoSizes.onBoardSize,
@@ -122,35 +117,21 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               ),
               const SizedBox(height: Usizes.spaceBtwSections),
 
-              // Title
+              /// 🔐 Title & Subtitle
               Text(
                 UTexts.confirmEmail,
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: Usizes.spaceBtwItems),
-
-              // Subtitle with email
-              RichText(
+              Text(
+                UTexts.confirmEmailSentCode,
+                style: Theme.of(context).textTheme.labelLarge,
                 textAlign: TextAlign.center,
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'We sent a code to\n',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    TextSpan(
-                      text: 'your email address',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
               ),
               const SizedBox(height: Usizes.spaceBtwSections),
 
-              // 6 Code Input Boxes
+              /// 🔢 Code Input Boxes
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(6, (index) {
@@ -185,12 +166,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       ),
                       style: Theme.of(context).textTheme.titleLarge,
                       onChanged: (value) {
-                        // Move to next field when digit is entered
                         if (value.isNotEmpty && index < 5) {
                           FocusScope.of(context).nextFocus();
-                        }
-                        // Move to previous field when backspace is pressed
-                        if (value.isEmpty && index > 0) {
+                        } else if (value.isEmpty && index > 0) {
                           FocusScope.of(context).previousFocus();
                         }
                       },
@@ -200,7 +178,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               ),
               const SizedBox(height: Usizes.spaceBtwSections * 1),
 
-              // Verify Button
+              /// ▶ Continue Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -222,17 +200,34 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       strokeWidth: 2,
                     ),
                   )
-                      : const Text('Create Account'),
+                      : const Text('Verify Code'),
                 ),
               ),
-              const SizedBox(height: Usizes.spaceBtwSections * 1),
+              const SizedBox(height: Usizes.spaceBtwItems),
 
-              // Resend Option
+              /// Clear Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: OutlinedButton(
+                  onPressed: _isVerifying ? null : _clearCode,
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    disabledForegroundColor: Colors.grey,
+                  ),
+                  child: const Text('Clear'),
+                ),
+              ),
+              const SizedBox(height: Usizes.spaceBtwSections),
+
+              /// 📨 Resend Option
               TextButton(
                 onPressed: _isVerifying
                     ? null
                     : () async {
-                  await _authController.resendVerificationCode();
+                  await _authController.resendPasswordResetCode();
                   _clearCode();
                 },
                 child: RichText(

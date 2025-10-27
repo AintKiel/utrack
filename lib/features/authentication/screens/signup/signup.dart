@@ -26,17 +26,19 @@ class SignupScreen extends StatelessWidget {
                 UTexts.signupTitle,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              const SizedBox(height: Usizes.spaceBtwSections),
-
+              const SizedBox(height: Usizes.spaceBtwSections * 0.5),
               /// Form
               USignup_Form(dark: dark),
-
+              /// Add spacing before divider
+              const SizedBox(height: Usizes.spaceBtwSections * 1),
               /// Divider
               UFormDivider(dividerText: UTexts.orSignInWith.capitalize),
-              const SizedBox(height: Usizes.spaceBtwSections),
-
-              /// Social Buttons
-              const USocialButtons(),
+              /// Add spacing after divider
+              const SizedBox(height: Usizes.spaceBtwSections * 0.5),
+              /// Social Buttons - Centered
+              Center(
+                child: const USocialButtons(),
+              ),
             ],
           ),
         ),
@@ -45,12 +47,9 @@ class SignupScreen extends StatelessWidget {
   }
 }
 
-
-
 extension StringCasingExtension on String {
   String get capitalize {
     if (isEmpty) return this;
     return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
-

@@ -18,7 +18,7 @@ class ULoginHeader extends StatelessWidget {
           child: Image(
             height: 140,
             image: AssetImage(
-              dark ? UImages.lightAppLogo : UImages.darkAppLogo,
+              dark ? UImages.darkAppLogo : UImages.lightAppLogo,
             ),
           ),
         ),
@@ -34,6 +34,7 @@ class ULoginHeader extends StatelessWidget {
           textAlign: TextAlign.left,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
+        const SizedBox(height: Usizes.spaceBtwSections * 1),
       ],
     );
   }
