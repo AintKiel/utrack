@@ -22,11 +22,10 @@ class NavigationMenu extends StatelessWidget {
           indicatorColor: dark ? UColors.white.withOpacity(0.1) : UColors.black.withOpacity(0.1),
           onDestinationSelected: (index) => controller.selectedIndex.value = index,
           destinations: [
-            NavigationDestination(icon: UIcons.home(color: dark ? UColors.grey : UColors.darkGrey), label: 'Home'),
-            NavigationDestination(icon: UIcons.lendIcon(color: dark ? UColors.grey : UColors.darkGrey), label: 'Lend'),
-            NavigationDestination(icon: UIcons.borrowIcon(color: dark ? UColors.grey : UColors.darkGrey), label: 'Borrow'),
-            NavigationDestination(icon: UIcons.history(color: dark ? UColors.grey : UColors.darkGrey), label: 'History'),
-            NavigationDestination(icon: UIcons.user(color: dark ? UColors.grey : UColors.darkGrey), label: 'Profile'),
+            NavigationDestination(icon: UIcons.home(size: UIcons.large, color: dark ? UColors.grey : UColors.darkGrey), label: 'Home'),
+            NavigationDestination(icon: UIcons.loan(size: UIcons.large, color: dark ? UColors.grey : UColors.darkGrey), label: 'Loans'),
+            NavigationDestination(icon: UIcons.history(size: UIcons.large, color: dark ? UColors.grey : UColors.darkGrey), label: 'History'),
+            NavigationDestination(icon: UIcons.user(size: UIcons.large, color: dark ? UColors.grey : UColors.darkGrey), label: 'Profile'),
           ],
         ),
       ),
@@ -41,7 +40,6 @@ class NavigationController extends GetxController{
   final screens = [
     const HomePageScreen(),
     Container(color: Colors.purple),
-    Container(color: Colors.blue),
     Container(color: Colors.orange),
     Container(color: Colors.red),];
 }

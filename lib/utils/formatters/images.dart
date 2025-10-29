@@ -15,7 +15,7 @@ class ULogos {
 class ULogoSizes {
   // App Logos
   static const double appLogoLarge = 150;   // For splashscreen / home (big logo)
-  static const double appLogoSmall = 40;    // For AppBar / header (small logo)
+  static const double appLogoSmall = 60;    // For AppBar / header (small logo)
 
   // Social Media
   static const double socialLogoSize = 48;  // For Google / Facebook buttons

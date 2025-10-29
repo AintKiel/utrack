@@ -47,4 +47,40 @@ class UTexts {
   static const String resendEmail= "Resend Email";
   static const String resendEmailIn = "Resend Email in";
 
+  // -- AppBar
+  static const String utrack = "UTrack";
+  static const String utrackSubTitle = "Your trusted utang tracker";
+
+  // -- Home Page
+  static const String personalAccount = "Personal Account";
+  static const String storeAccount = "Store Account";
+  static const String welcome = "Welcome,";
+  static const String avatar = "JDC";
+  static const String myQr = "My QR";
+  static const String scan = "Scan";
+  static const String totalLent = "Total Lent";
+  static const String totalOwed = "Total Owed";
+  static const String borrower = " Borrower/s";
+  static const String lender = " Lender/s";
+  static const String sumBorrower = "10";
+  static const String sumLender = "2";
+  static const String totalLend = "15,500";
+  static const String totalBorrowed = "3,500";
+  static const String financialHealth = "Financial Health";
+  static const String creditScore = "Credit Score";
+  static const String paymentHistory = "Payment History";
+  static const String trustRating = "Trust Rating";
+
+  ///alert messages
+  static const String youHave= "You have";
+  static const String total= "1,000php";
+  static const String youHavecon= " overdue\npayment";
+  static const String overdue = "Overdue Payment";
+  static const String paynow = "Pay Now";
+
+  static const String dueSubtitle= "Pay before due for good\nrating!";
+  static const String dueAlert = "DueAlert";
+
+  static const String noteSubtitle= "Ratings in good condition";
+  static const String goodConditon = "Keep it up!";
 }

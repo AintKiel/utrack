@@ -16,7 +16,7 @@ class UAppTheme {
     brightness: Brightness.light,
 
     // Custom Themes
-    appBarTheme: UAppBarTheme.lightAppBarTheme,
+    appBarTheme: UAppBarTheme.LightAppBarTheme,
     bottomSheetTheme: UBottomSheetTheme.lightBottomSheetTheme,
     checkboxTheme: UCheckboxTheme.lightCheckboxTheme,
     chipTheme: UChipTheme.lightChipTheme,
@@ -32,7 +32,7 @@ class UAppTheme {
     brightness: Brightness.dark,
 
     // Custom Themes
-    appBarTheme: UAppBarTheme.darkAppBarTheme,
+    appBarTheme: UAppBarTheme.DarkAppBarTheme,
     bottomSheetTheme: UBottomSheetTheme.darkBottomSheetTheme,
     checkboxTheme: UCheckboxTheme.darkCheckboxTheme,
     chipTheme: UChipTheme.darkChipTheme,

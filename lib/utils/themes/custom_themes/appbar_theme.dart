@@ -5,27 +5,27 @@ import 'package:utrack/utils/themes/custom_themes/sizes.dart';
 class UAppBarTheme {
   UAppBarTheme._();
 
-  static AppBarTheme lightAppBarTheme = AppBarTheme(
+  // 🌤️ Light AppBar Theme
+  static const LightAppBarTheme = AppBarTheme(
     elevation: 0,
-    backgroundColor: Colors.white70,
-    foregroundColor: UColors.light.text,
     centerTitle: false,
-    titleTextStyle: TextStyle(
-      color: UColors.light.text,
-      fontSize: Usizes.fontSizeLg,
-      fontWeight: FontWeight.w600,
-    ),
+    scrolledUnderElevation: 0,
+    backgroundColor: Colors.transparent,
+    surfaceTintColor: Colors.transparent,
+    iconTheme: IconThemeData(color: UColors.black, size: Usizes.iconMd,),
+    actionsIconTheme: IconThemeData(color: UColors.black, size: Usizes.iconMd,),
+    titleTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: UColors.black,),
   );
 
-  static AppBarTheme darkAppBarTheme = AppBarTheme(
+  // 🌙 Dark AppBar Theme
+  static const DarkAppBarTheme = AppBarTheme(
     elevation: 0,
-    backgroundColor: Colors.black38,
-    foregroundColor: UColors.dark.text,
     centerTitle: false,
-    titleTextStyle: TextStyle(
-      color: UColors.dark.text,
-      fontSize: Usizes.fontSizeLg,
-      fontWeight: FontWeight.w600,
-    ),
+    scrolledUnderElevation: 0,
+    backgroundColor: Colors.transparent,
+    surfaceTintColor: Colors.transparent,
+    iconTheme: IconThemeData(color: UColors.white, size: Usizes.iconMd,),
+    actionsIconTheme: IconThemeData(color: UColors.white, size: Usizes.iconMd,),
+    titleTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: UColors.white,),
   );
 }
