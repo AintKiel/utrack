@@ -9,6 +9,7 @@ import 'package:utrack/features/authentication/screens/signup/verify_email.dart'
 import 'package:utrack/features/authentication/screens/login/login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../screens/signup/complete_profile_screen.dart';
+import '../screens/signup/id_validation.dart';
 
 class AuthenticationController extends GetxController {
   static AuthenticationController get instance => Get.find();
@@ -49,8 +50,19 @@ class AuthenticationController extends GetxController {
     if (user == null) {
       Get.offAll(() => const LoginScreen());
     } else {
-      // User is logged in
-      // Get.offAll(() => const HomeScreen());
+      // User is logged in: enforce ID verification gate globally
+      _firestore.collection('Users').doc(user.uid).get().then((doc) {
+        final data = (doc.data() ?? {}) as Map<String, dynamic>;
+        final bool verified = (data['idVerified'] ?? false) == true;
+        if (!verified) {
+          Get.offAll(() => const IdValidationScreen());
+        } else {
+          // Keep existing routing (e.g., to Home) as per app flow
+        }
+      }).catchError((_) {
+        // If fetch fails, default to requiring verification for safety
+        Get.offAll(() => const IdValidationScreen());
+      });
     }
   }
 
@@ -736,7 +748,7 @@ class AuthenticationController extends GetxController {
 
           // Navigate to profile completion screen
           Future.delayed(const Duration(milliseconds: 500), () {
-            Get.to(() => CompleteProfileScreen(
+            Get.offAll(() => CompleteProfileScreen(
               userId: user.uid,
               email: user.email ?? '',
               firstName: user.displayName?.split(' ')[0] ?? 'User',
@@ -744,15 +756,32 @@ class AuthenticationController extends GetxController {
             ));
           });
         } else {
-          // Existing user - just show success
-          Get.snackbar(
-            'Success',
-            'Logged in with Google!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 2),
-          );
+          // Existing user - require ID verification if not verified
+          final doc = await _firestore.collection('Users').doc(user.uid).get();
+          final data = (doc.data() ?? {}) as Map<String, dynamic>;
+          final bool verified = (data['idVerified'] ?? false) == true;
+          if (!verified) {
+            Get.snackbar(
+              'Action required',
+              'Please verify your ID to continue',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.orange,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 2),
+            );
+            Future.delayed(const Duration(milliseconds: 400), () {
+              Get.offAll(() => const IdValidationScreen());
+            });
+          } else {
+            Get.snackbar(
+              'Success',
+              'Logged in with Google!',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 2),
+            );
+          }
         }
 
         print('✅ Google Sign-In complete!');

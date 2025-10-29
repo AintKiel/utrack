@@ -5,6 +5,7 @@ import '../login/login.dart';
 import 'package:utrack/utils/constants/colors.dart';
 import 'package:utrack/utils/helpers/helper_functions.dart';
 import 'package:utrack/features/authentication/controllers/authentication_controller.dart';
+import 'package:utrack/features/authentication/screens/signup/id_validation.dart';
 
 
 
@@ -79,9 +80,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           duration: const Duration(seconds: 2),
         );
 
-        // Close this screen and go to home
+        // Require ID verification next
         Future.delayed(const Duration(milliseconds: 500), () {
-          Get.offAll(() => const LoginScreen()); // Or your HomeScreen
+          Get.offAll(() => const IdValidationScreen());
         });
       } catch (e) {
         Get.snackbar(
