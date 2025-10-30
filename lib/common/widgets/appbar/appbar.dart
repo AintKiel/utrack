@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/themes/custom_themes/device_utility.dart';
-import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../../utils/formatters/images.dart';
 import '../../../utils/helpers/helper_functions.dart';
+import '../../../utils/themes/custom_themes/sizes.dart';
 
 class UAppBar extends StatelessWidget implements PreferredSizeWidget {
   const UAppBar({
@@ -16,7 +16,7 @@ class UAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leadingIcon,
     this.leadingOnPressed,
     this.showLogo = true,
-    this.backgroundColor = UColors.primary,
+    this.backgroundColor = Colors.transparent,
     this.showBackArrow = false,
   });
 
@@ -32,56 +32,39 @@ class UAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final dark = UHelperFunctions.isDarkMode(context);
 
-    /// 👇 Wrap the AppBar inside a container with full background extension
-    return Container(
-      color: backgroundColor, // 👈 This color now extends behind the status bar
-      child: SafeArea(
-        top: false, // 👈 Allow the background to go behind the status bar
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 0),
-          child: AppBar(
-            backgroundColor: Colors.transparent, // 👈 Transparent so container color shows
-            elevation: 0,
-            automaticallyImplyLeading: false,
-            leadingWidth: showLogo ? 10 : null,
+    return AppBar(
+      backgroundColor: backgroundColor,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      automaticallyImplyLeading: false,
+      toolbarHeight: UDeviceUtility.getAppBarHeight(),
+      leadingWidth: showLogo ? 10 : null,
 
-            /// --- Leading Icon / Back Button ---
-            leading: showBackArrow
-                ? IconButton(
-              onPressed: () => Get.back(),
-              icon: UIcons.back(),
-            )
-                : leadingIcon != null
-                ? IconButton(
-              onPressed: leadingOnPressed,
-              icon: UIcons.forward(),
-            )
-                : null,
+      leading: showBackArrow
+          ? IconButton(onPressed: () => Get.back(), icon: UIcons.back())
+          : leadingIcon != null
+          ? IconButton(onPressed: leadingOnPressed, icon: UIcons.forward())
+          : null,
 
-            /// --- Title Section ---
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                if (showLogo) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 0),
-                    child: Image.asset(
-                      UImages.lightAppLogo,
-                      height: ULogoSizes.appLogoSmall,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                ],
-                if (title != null) title!,
-              ],
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          if (showLogo) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 0),
+              child: Image.asset(
+                UImages.lightAppLogo,
+                height: ULogoSizes.appLogoSmall,
+              ),
             ),
-
-            /// --- Action Buttons ---
-            actions: actions,
-          ),
-        ),
+            const SizedBox(width: 4),
+          ],
+          if (title != null) title!,
+        ],
       ),
+
+      actions: actions,
     );
   }
 

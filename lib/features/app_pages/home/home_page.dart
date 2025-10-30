@@ -63,16 +63,24 @@ class HomePageScreen extends StatelessWidget {
                 /// --- Financial health Section ---
                 Container(
                   width: double.infinity,
-                  color: Colors.transparent,
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  decoration: const BoxDecoration(
+                    color: Colors.transparent,
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20), // spacing under the two boxes
-                      FinancialHealth(),
-                      SizedBox(height: 20),
-                      RecentActivity(),
-                    ],
+
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+                        FinancialHealth(),
+                        SizedBox(height: 20),
+                        RecentActivity(),
+                        SizedBox(height: 50),
+                      ],
+                    ),
                   ),
                 ),
               ],

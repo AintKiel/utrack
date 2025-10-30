@@ -11,7 +11,7 @@ class UHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return UAppBar(
       showLogo: true,
-      backgroundColor: UColors.primary,
+      backgroundColor: Colors.transparent,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -31,8 +31,6 @@ class UHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
-
-      /// --- Action Buttons (Notification Icon) ---
       actions: [
         Notification_Widget(
           onPressed: () {},
@@ -42,7 +40,6 @@ class UHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  /// 👇 Explicitly define preferredSize (still required for Scaffold)
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
