@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../features/app_pages/home/notif_screen.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../notification/notif_widget.dart';
@@ -33,7 +35,7 @@ class UHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         Notification_Widget(
-          onPressed: () {},
+          onPressed: () => Get.to(() => const UNotificationScreen()),
           iconColor: UColors.white,
         ),
       ],

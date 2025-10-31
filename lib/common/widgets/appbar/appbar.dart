@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/themes/custom_themes/device_utility.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../../utils/formatters/images.dart';
 import '../../../utils/helpers/helper_functions.dart';
-import '../../../utils/themes/custom_themes/sizes.dart';
 
 class UAppBar extends StatelessWidget implements PreferredSizeWidget {
   const UAppBar({
