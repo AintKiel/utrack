@@ -54,7 +54,7 @@ class UColors {
   static const Color grey = Color(0xFF9E9E9E);      // Standard grey
   static const Color darkGrey = Color(0xFF424242);  // Darker grey
   static const Color white = Colors.white;          // white
-  static const Color black = Colors.black;          // black
+  static const Color black = Colors.black87;          // black
 }
 
 class _LightColors {

@@ -3,6 +3,8 @@ import 'package:utrack/features/app_pages/home/qr_screen.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
 import '../../../../../utils/formatters/icons.dart';
+import '../../notifWidgets/manual_utang.dart';
+import '../../scan_utang_form.dart';
 
 
 class UScanQrButton extends StatelessWidget {
@@ -58,8 +60,29 @@ class UScanQrButton extends StatelessWidget {
             ),
           ),
 
-
-          const SizedBox(width: 1),
+          SizedBox(
+            width: 42,
+            height: 42,
+            child: ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierColor: Colors.black.withOpacity(0.6),
+                  builder: (context) => const RequestUtangPopup(),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: UColors.secondary.withOpacity(0.9),
+                foregroundColor: Colors.white,
+                elevation: 6,
+                shadowColor: Colors.black26,
+                shape: const CircleBorder(),
+                padding: const EdgeInsets.all(0), // Adjust for button size
+              ),
+              child: const Icon(Icons.add, size: 25, color: Colors.white,),
+            ),
+          ),
 
           // Record Utang button
           SizedBox(

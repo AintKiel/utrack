@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class UtangFormPopup extends StatefulWidget {
-  const UtangFormPopup({super.key});
+class RequestUtangPopup extends StatefulWidget {
+  const RequestUtangPopup({super.key});
 
   @override
-  State<UtangFormPopup> createState() => _UtangFormPopupState();
+  State<RequestUtangPopup> createState() => _RequestUtangPopupState();
 }
 
-class _UtangFormPopupState extends State<UtangFormPopup> {
+class _RequestUtangPopupState extends State<RequestUtangPopup> {
   String repaymentType = "Single Repayment";
   final TextEditingController userIdController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -32,7 +32,7 @@ class _UtangFormPopupState extends State<UtangFormPopup> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Utang Details",
+                  "Request Utang",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -45,6 +45,11 @@ class _UtangFormPopupState extends State<UtangFormPopup> {
               ],
             ),
             const SizedBox(height: 16),
+
+            /// --- User ID
+            _buildTextField("User ID", "Type User ID", controller: userIdController),
+
+            const SizedBox(height: 12),
 
             /// --- Amount
             _buildTextField("Amount (₱)*", "Enter amount", controller: amountController, keyboardType: TextInputType.number),
@@ -76,6 +81,12 @@ class _UtangFormPopupState extends State<UtangFormPopup> {
                 ),
               ],
             ),
+
+            const SizedBox(height: 12),
+
+            /// --- Notes
+            _buildTextField("Notes (Optional)", "Add any additional notes...", controller: noteController, maxLines: 3),
+
             const SizedBox(height: 20),
 
             /// --- Action Buttons
