@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../features/app_pages/home/notif_screen.dart';
+import 'package:utrack/features/app_pages/home/notifWidgets/notif_screen.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../notification/notif_widget.dart';

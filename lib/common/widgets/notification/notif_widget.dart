@@ -17,7 +17,7 @@ class Notification_Widget extends StatelessWidget {
     return Stack(
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: onPressed,
           icon: UIcons.notification(size: 40, color: iconColor),
         ),
         Positioned(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:utrack/features/app_pages/home/qr_screen.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
 import '../../../../../utils/formatters/icons.dart';
@@ -24,7 +24,14 @@ class UScanQrButton extends StatelessWidget {
             width: 110,
             height: 42,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierColor: Colors.black.withOpacity(0.6),
+                  builder: (context) => const MyQrPopup(),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: UColors.white.withOpacity(0.8),
                 foregroundColor: Colors.black,
@@ -50,6 +57,7 @@ class UScanQrButton extends StatelessWidget {
               ),
             ),
           ),
+
 
           const SizedBox(width: 1),
 

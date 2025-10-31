@@ -13,10 +13,9 @@ class HomePageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /// 👇 No background extension, appbar scrolls away naturally
+
       extendBodyBehindAppBar: true,
 
-      /// Transparent AppBar that disappears when scrolling
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AppBar(
@@ -30,45 +29,19 @@ class HomePageScreen extends StatelessWidget {
       ),
 
       /// --- Body content (scrollable)
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Stack(
+
+        body: Stack(
           clipBehavior: Clip.none,
           children: [
-            /// --- Scrollable Content ---
-            Column(
-              children: [
-                /// --- Blue Header Background ---
-                const UPrimaryHeaderContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 80), // 👈 reduced height (was 80)
-
-                      /// Profile Card with Overlapping Alert
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          ProfileCard(),
-
-                          /// Payment Alert (e.g. OverdueAlert() / WarningAlert() / GoodCondition())
-                          OverdueAlert(),
-                          SizedBox(height: 100),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                /// --- Financial health Section ---
-                Container(
+            /// --- White scrollable section (FinancialHealth + RecentActivity only)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.44, // 👈 adjust as needed
+                child: Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.55,
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: const Column(
@@ -83,19 +56,37 @@ class HomePageScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
 
-            /// --- Utang Summary Boxes (Overlapping Section) ---
+
+            /// --- Blue header + fixed items above ---
+            const UPrimaryHeaderContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 80),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ProfileCard(),
+                      OverdueAlert(),
+                      SizedBox(height: 100),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            /// --- Utang summary section (floating overlap) ---
             const Positioned(
-              top: 80, // 👈 keep your preferred alignment
+              top: 80,
               left: 17,
               right: 17,
               child: UtangSummarySection(),
             ),
           ],
-        ),
-      ),
+        )
     );
   }
 }
