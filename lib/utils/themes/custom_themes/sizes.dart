@@ -1,4 +1,3 @@
-/// This file should be located at: lib/utils/themes/custom_themes/sizes.dart
 
 class Usizes {
   // Padding and margin sizes

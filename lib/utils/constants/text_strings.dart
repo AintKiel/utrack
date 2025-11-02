@@ -125,4 +125,108 @@ class UTexts {
   static const String loading = "Loading...";
   static const String tryAgain = "Try Again";
   static const String continueString = "Continue";
+
+
+
+
+
+  static const String changeYourPasswordSubTitle= "Your Account Security is Our Priority! We've Sent You a Secure Link to Safely Change Your Password and Keep Your Account Protected.";
+
+
+  static const String username= "Username";
+
+  // -- AppBar
+  static const String utrack = "UTrack";
+  static const String utrackSubTitle = "Your trusted utang tracker";
+
+  // -- Home Page
+  static const String personalAccount = "Personal Account";
+  static const String storeAccount = "Store Account";
+  static const String welcome = "Welcome,";
+  static const String avatar = "JDC";
+  static const String myQr = "My QR";
+  static const String scan = "Scan";
+  static const String totalLent = "Total Lent";
+  static const String totalOwed = "Total Owed";
+  static const String borrower = " Borrower/s";
+  static const String lender = " Lender/s";
+  static const String sumBorrower = "10";
+  static const String sumLender = "2";
+  static const String totalLend = "15,500";
+  static const String totalBorrowed = "3,500";
+  static const String financialHealth = "Financial Health";
+  static const String creditScore = "Credit Score";
+  static const String paymentHistory = "Payment History";
+  static const String trustRating = "Trust Rating";
+  static const String viewDetails = "View Details";
+  static const String viewRequest = "View Request";
+  static const String remind = "Remind";
+
+  ///alert messages
+  static const String youHave= "You have";
+  static const String total= "1,000php";
+  static const String youHavecon= " overdue\npayment";
+  static const String overdue = "Overdue Payment";
+  static const String paynow = "Pay Now";
+
+  static const String dueSubtitle= "Pay before due for good\nrating!";
+  static const String dueAlert = "DueAlert";
+
+  static const String noteSubtitle= "Ratings in good condition";
+  static const String goodConditon = "Keep it up!";
+
+  ///-------notif texts---------
+  static const String notif = "Notifications";
+  static const String notifSubTitle = "Stay updated on your lending and borrowing activities";
+
+  // --- Payment Related ---
+  static const String overduePaymentTitle = "Overdue Payment Alert";
+  static const String overduePaymentBody = "Your debt is overdue. This is affecting your credit score.";
+
+  static const String paymentReminderTitle = "Payment Reminder";
+  static const String paymentReminderBody = "You have a pending payment reminder from your lender.";
+
+  static const String paymentReceivedTitle = "Payment Received";
+  static const String paymentReceivedBody = "You received a payment from your borrower.";
+
+  static const String paymentSentTitle = "Payment Sent";
+  static const String paymentSentBody = "You successfully paid your lender.";
+
+  static const String upcomingPaymentTitle = "Upcoming Payment Due";
+  static const String upcomingPaymentBody = "Your next payment is due soon. Don’t forget to pay on time!";
+
+  // --- Credit Score Related ---
+  static const String creditScoreIncreaseTitle = "Credit Score Increased";
+  static const String creditScoreIncreaseBody = "Your credit score improved due to consistent payments.";
+
+  static const String creditScoreDecreaseTitle = "Credit Score Decreased";
+  static const String creditScoreDecreaseBody = "Your credit score dropped due to overdue payments.";
+
+  // --- Borrowing / Lending ---
+  static const String newBorrowRequestTitle = "New Borrowing Request";
+  static const String newBorrowRequestBody = "Someone requested to borrow money from you.";
+
+  static const String requestApprovedTitle = "Request Approved";
+  static const String requestApprovedBody = "Your lending request has been approved.";
+
+  static const String requestRejectedTitle = "Request Rejected";
+  static const String requestRejectedBody = "Your lending request was declined.";
+
+  static const String loanFullyRepaidTitle = "Utang Fully Paid";
+  static const String loanFullyRepaidBody = "Your borrower has fully paid their utang.";
+
+  static const String loanDueSoonTitle = "Loan Due Soon";
+  static const String loanDueSoonBody = "One of your borrower’s repayments is due tomorrow.";
+
+  ///qr code texts
+  static const String qrCode = "QR Code";
+  static const String nameExample = "Juan Dela Cruz";
+  static const String addressExample = "Brgy. Maligaya, Quezon City";
+  static const String phoneExample = "+63 917 4567";
+  static const String creditScoreEx = ": 85%";
+  static const String userID = "User ID: ";
+  static const String userIDex = "user123";
+  static const String qrUse = "📌 You can show this QR code to your lender or borrower to share your credit profile quickly and securely.";
+  static const String download = "Download";
+  static const String share = "Share";
 }

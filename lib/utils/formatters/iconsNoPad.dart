@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class UIcons {
+class UIconsNoPad {
   // Default sizes
   static const double small = 20.0;
   static const double regular = 24.0;
@@ -12,16 +12,14 @@ class UIcons {
         double size = regular,
         Color? color,
       }) {
-    return Padding(
-      padding: EdgeInsets.all((48 - size) / 2), // centers smaller icons
-      child: Image.asset(
-        'assets/icons/$name.png',
-        width: size,
-        height: size,
-        color: color,
-        fit: BoxFit.contain,
-      ),
+    return Image.asset(
+      'assets/icons/$name.png',
+      width: size,
+      height: size,
+      color: color,
+      fit: BoxFit.contain,
     );
+
   }
 
   // Icons
@@ -78,6 +76,9 @@ class UIcons {
 
   static Widget password({double size = regular, Color? color}) =>
       _icon("password", size: size, color: color);
+
+  static Widget pesoSign({double size = regular, Color? color}) =>
+      _icon("pesoSign", size: size, color: color);
 
   static Widget phone({double size = regular, Color? color}) =>
       _icon("phone", size: size, color: color);

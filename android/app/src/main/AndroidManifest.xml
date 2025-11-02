@@ -1,5 +1,11 @@
 ﻿<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.paul.utrack">
+
+    <!-- Add these permissions -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
     <application
         android:label="utrack"
         android:icon="@mipmap/ic_launcher">
@@ -30,5 +36,17 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Add these for url_launcher to find browsers -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="http"/>
+        </intent>
+        <!-- Chrome specific -->
+        <package android:name="com.android.chrome" />
+        <package android:name="com.google.android.gms" />
     </queries>
 </manifest>

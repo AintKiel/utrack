@@ -10,6 +10,8 @@ class ULogos {
   static const String google = "assets/images/google.png";
   static const String facebook = "assets/images/facebook.png";
   static const String sendEmail = "assets/images/send_email.png";
+  static const String verifyID = "assets/images/id_verify.png";
+  static const String notifLogo = "assets/images/notification.png";
 }
 
 /// Logo Sizes (for consistent scaling)

@@ -10,6 +10,7 @@ import 'package:utrack/features/authentication/screens/login/login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../screens/signup/complete_profile_screen.dart';
 import '../screens/signup/id_validation.dart';
+import 'package:utrack/navigation_menu.dart';
 
 class AuthenticationController extends GetxController {
   static AuthenticationController get instance => Get.find();
@@ -57,7 +58,8 @@ class AuthenticationController extends GetxController {
         if (!verified) {
           Get.offAll(() => const IdValidationScreen());
         } else {
-          // Keep existing routing (e.g., to Home) as per app flow
+          // User is verified, navigate to home
+          Get.offAll(() => NavigationMenu());
         }
       }).catchError((_) {
         // If fetch fails, default to requiring verification for safety
@@ -332,6 +334,7 @@ class AuthenticationController extends GetxController {
   }
 
   /// Save user data to Firestore
+  /// Save user data to Firestore WITH QR CODE GENERATION
   Future<void> _saveUserDataToFirestore({
     required String uid,
     required String firstName,
@@ -341,6 +344,9 @@ class AuthenticationController extends GetxController {
     required String address,
   }) async {
     try {
+      // Generate unique QR data
+      String qrData = 'utrack://user/$uid?email=$email';
+
       await _firestore.collection('Users').doc(uid).set({
         'uid': uid,
         'firstName': firstName,
@@ -351,7 +357,11 @@ class AuthenticationController extends GetxController {
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
         'emailVerified': true,
+        'qrCode': 'utrack://user/$uid?email=$email',
+        'qrCreatedAt': FieldValue.serverTimestamp(),
       });
+
+      print('✅ User created with QR code: $qrData');
     } catch (e) {
       print('Error saving user data to Firestore: $e');
       throw e;
@@ -830,20 +840,55 @@ class AuthenticationController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      isLoading.value = false;
+      // Check if user exists in Firestore
+      if (userCredential.user != null) {
+        final userDoc = await _firestore
+            .collection('Users')
+            .doc(userCredential.user!.uid)
+            .get();
 
-      Get.snackbar(
-        'Success',
-        'Login successful!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+        if (userDoc.exists) {
+          final userData = userDoc.data() as Map<String, dynamic>;
+          final bool verified = (userData['idVerified'] ?? false) == true;
+
+          isLoading.value = false;
+
+          Get.snackbar(
+            'Success',
+            'Login successful!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+
+          // Navigate based on ID verification status
+          if (!verified) {
+            // User needs to verify ID
+            Future.delayed(const Duration(milliseconds: 500), () {
+              Get.offAll(() => const IdValidationScreen());
+            });
+          } else {
+            // User is fully verified, go to home
+            Future.delayed(const Duration(milliseconds: 500), () {
+              Get.offAll(() => NavigationMenu());
+            });
+          }
+        } else {
+          isLoading.value = false;
+          Get.snackbar(
+            'Error',
+            'User profile not found. Please contact support.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
+      }
     } on FirebaseAuthException catch (e) {
       isLoading.value = false;
       _handleAuthException(e);
@@ -858,7 +903,6 @@ class AuthenticationController extends GetxController {
       );
     }
   }
-
   /// Update password after code verification
   /// Just delete the old account and create new one with new password
   Future<void> updatePasswordDirectly({

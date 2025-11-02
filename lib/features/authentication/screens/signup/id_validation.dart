@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'dart:io';
+import 'package:utrack/navigation_menu.dart';
 
 class IdValidationScreen extends StatefulWidget {
   const IdValidationScreen({super.key});
@@ -369,7 +370,7 @@ class _IdValidationScreenState extends State<IdValidationScreen> {
       );
 
       Future.delayed(const Duration(seconds: 2), () {
-        Get.offAll(() => const LoginScreen());
+        Get.offAll(() => NavigationMenu());
       });
     } on CloudinaryException catch (e) {
       setState(() => _isUploading = false);

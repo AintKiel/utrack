@@ -110,8 +110,8 @@ class _ForgetPassVerifyEmailScreenState
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               /// 📩 Image Section
-              Image(
-                image: const AssetImage("assets/images/send_email.png"),
+              Image.asset(
+                ULogos.sendEmail,
                 height: ULogoSizes.onBoardSize,
                 width: UHelperFunctions.screenWidth(context) * 0.6,
               ),
