@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:utrack/features/app_pages/lending_page/lending_page.dart';
-import 'package:utrack/utils/constants/text_strings.dart';
+import 'package:utrack/features/app_pages/borrowing_page/borrowing_page.dart';
 import '../../../../../utils/constants/colors.dart';
+import '../../../../../utils/constants/text_strings.dart';
 import '../../../../../utils/formatters/iconsNoPad.dart';
-import '../../../borrowing_page/borrowing_page.dart';
 
 class UtangSummarySection extends StatefulWidget {
   const UtangSummarySection({super.key});
@@ -19,10 +19,22 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+
+    // Responsive box height & padding
+    final boxHeight = isSmallScreen ? 70.0 : 83.0;
+    final horizontalPadding = isSmallScreen ? 6.0 : 10.0;
+    final fontSizeTitle = isSmallScreen ? 12.0 : 13.0;
+    final fontSizeAmount = isSmallScreen ? 16.0 : 18.0;
+
     return Padding(
-      padding: const EdgeInsets.only(top: 250, left: 20, right: 20),
+      padding: EdgeInsets.only(
+        top: screenWidth * 0.6, // responsive spacing from top
+        left: 16,
+        right: 16,
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 🔹 Total Lent Box
           Expanded(
@@ -37,7 +49,7 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
                 scale: _scale1,
                 duration: const Duration(milliseconds: 100),
                 child: Container(
-                  height: 83,
+                  height: boxHeight,
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
                     color: UColors.lendBg.withOpacity(0.9),
@@ -52,59 +64,68 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding, vertical: 8),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Header
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            UIconsNoPad.lendIcon(color: UColors.lendFont, size: 18),
+                            UIconsNoPad.lendIcon(
+                                color: UColors.lendFont, size: 18),
                             const SizedBox(width: 5),
-                            const Text(
+                            Text(
                               UTexts.totalLent,
                               style: TextStyle(
                                 color: UColors.lendFont,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 13,
+                                fontSize: fontSizeTitle,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 6),
+                        // Amount
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            UIconsNoPad.pesoSign(color: UColors.lendFont, size: 18),
+                            UIconsNoPad.pesoSign(
+                                color: UColors.lendFont, size: 18),
                             const SizedBox(width: 3),
-                            const Text(
+                            Text(
                               UTexts.totalLend,
                               style: TextStyle(
                                 color: UColors.lendFont,
-                                fontSize: 18,
+                                fontSize: fontSizeAmount,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(width: 9),
-                            GestureDetector(
-                              onTap: () {},
-                              child: UIconsNoPad.visibilityOn(
-                                color: UColors.lendFont,
-                                size: 18,
-                              ),
+                            UIconsNoPad.visibilityOn(
+                              color: UColors.lendFont,
+                              size: 18,
                             ),
                           ],
                         ),
+                        // Footer
                         Text.rich(
                           TextSpan(
                             children: [
                               TextSpan(
                                 text: UTexts.sumBorrower,
-                                style: TextStyle(color: UColors.lendFont, fontSize: 10, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    color: UColors.lendFont,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600),
                               ),
                               TextSpan(
                                 text: UTexts.borrower,
-                                style: TextStyle(color: UColors.lendFont, fontSize: 10, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    color: UColors.lendFont,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
@@ -131,7 +152,7 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
                 scale: _scale2,
                 duration: const Duration(milliseconds: 100),
                 child: Container(
-                  height: 83,
+                  height: boxHeight,
                   margin: const EdgeInsets.only(left: 8),
                   decoration: BoxDecoration(
                     color: UColors.borrowBg.withOpacity(0.9),
@@ -146,21 +167,23 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding, vertical: 8),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            UIconsNoPad.borrowIcon(color: UColors.borrowFont, size: 18),
+                            UIconsNoPad.borrowIcon(
+                                color: UColors.borrowFont, size: 18),
                             const SizedBox(width: 5),
-                            const Text(
+                            Text(
                               UTexts.totalOwed,
                               style: TextStyle(
                                 color: UColors.borrowFont,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 13,
+                                fontSize: fontSizeTitle,
                               ),
                             ),
                           ],
@@ -169,23 +192,21 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            UIconsNoPad.pesoSign(color: UColors.borrowFont, size: 18),
+                            UIconsNoPad.pesoSign(
+                                color: UColors.borrowFont, size: 18),
                             const SizedBox(width: 3),
-                            const Text(
+                            Text(
                               UTexts.totalBorrowed,
                               style: TextStyle(
                                 color: UColors.borrowFont,
-                                fontSize: 18,
+                                fontSize: fontSizeAmount,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(width: 9),
-                            GestureDetector(
-                              onTap: () {},
-                              child: UIconsNoPad.visibilityOn(
-                                color: UColors.borrowFont,
-                                size: 18,
-                              ),
+                            UIconsNoPad.visibilityOn(
+                              color: UColors.borrowFont,
+                              size: 18,
                             ),
                           ],
                         ),
@@ -194,11 +215,17 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
                             children: [
                               TextSpan(
                                 text: UTexts.sumLender,
-                                style: TextStyle(color: UColors.borrowFont, fontSize: 10, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    color: UColors.borrowFont,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600),
                               ),
                               TextSpan(
                                 text: UTexts.lender,
-                                style: TextStyle(color: UColors.borrowFont, fontSize: 10, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    color: UColors.borrowFont,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
