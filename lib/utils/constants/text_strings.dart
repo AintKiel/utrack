@@ -143,4 +143,9 @@ class UTexts {
   static const String share = "Share";
 
   ///scan qr texts
+  static const String requestUtang = "Request Utang";
+  static const String typeUserid = "Input User ID";
+  static const String amount = "Amount";
+  static const String enterAmount = "Enter Amount";
+  static const String singleRepay = "Single Repayment";
 }

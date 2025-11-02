@@ -3,80 +3,87 @@ import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
 
 class UAvatar extends StatelessWidget {
-  const UAvatar({
-    super.key,
-  });
+  const UAvatar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            // Circle Avatar
-            Container(
-              width: 55,
-              height: 55,
-              decoration: const BoxDecoration(
-                color: UColors.primary,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                UTexts.avatar,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
 
-            // Name and subtitle
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      UTexts.welcome,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: UColors.white,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      'Juan', // first name of the user
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: UColors.white,
-                      ),
-                    ),
-                  ],
+    final avatarSize = isSmallScreen ? 45.0 : 55.0;
+    final nameFont = isSmallScreen ? 18.0 : 20.0;
+    final welcomeFont = isSmallScreen ? 14.0 : 16.0;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 10 : 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Circle Avatar
+              Container(
+                width: avatarSize,
+                height: avatarSize,
+                decoration: const BoxDecoration(
+                  color: UColors.primary,
+                  shape: BoxShape.circle,
                 ),
-                SizedBox(height: 1),
-                Text(
-                  UTexts.personalAccount,
+                alignment: Alignment.center,
+                child: Text(
+                  UTexts.avatar,
                   style: TextStyle(
-                    color: UColors.buttonDisabled,
-                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    fontSize: isSmallScreen ? 16 : 18,
+                    color: Colors.white,
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 50), // space before floating buttons
-      ],
-    );
+              ),
+              SizedBox(width: isSmallScreen ? 8 : 12),
 
+              // Name + subtitle
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        UTexts.welcome,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: welcomeFont,
+                          color: UColors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Juan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: nameFont,
+                          color: UColors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    UTexts.personalAccount,
+                    style: TextStyle(
+                      color: UColors.buttonDisabled,
+                      fontSize: isSmallScreen ? 12 : 14,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 40), // space before the next widget
+        ],
+      ),
+    );
   }
 }
-

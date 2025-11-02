@@ -12,8 +12,11 @@ class HomePageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360; // e.g., small phones
+    final isTablet = size.width > 600; // tablets
 
+    return Scaffold(
       extendBodyBehindAppBar: true,
 
       appBar: PreferredSize(
@@ -28,26 +31,29 @@ class HomePageScreen extends StatelessWidget {
         ),
       ),
 
-      /// --- Body content (scrollable)
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final height = constraints.maxHeight;
 
-        body: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            /// --- White scrollable section (FinancialHealth + RecentActivity only)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.44, // 👈 adjust as needed
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              /// --- Scrollable main content ---
+              Align(
+                alignment: Alignment.bottomCenter,
                 child: Container(
                   width: double.infinity,
-                  color: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  height: height * (isTablet ? 0.5 : 0.45),
+                  padding: EdgeInsets.symmetric(
+                    vertical: isSmallScreen ? 4 : 8,
+                    horizontal: isSmallScreen ? 8 : 16,
+                  ),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
+                        SizedBox(height: 1),
                         FinancialHealth(),
                         SizedBox(height: 20),
                         RecentActivity(),
@@ -57,36 +63,36 @@ class HomePageScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
 
-
-            /// --- Blue header + fixed items above ---
-            const UPrimaryHeaderContainer(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 80),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      ProfileCard(),
-                      OverdueAlert(),
-                      SizedBox(height: 100),
-                    ],
-                  ),
-                ],
+              /// --- Blue header section ---
+              const UPrimaryHeaderContainer(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 80),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ProfileCard(),
+                        OverdueAlert(),
+                        SizedBox(height: 100),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            /// --- Utang summary section (floating overlap) ---
-            const Positioned(
-              top: 80,
-              left: 17,
-              right: 17,
-              child: UtangSummarySection(),
-            ),
-          ],
-        )
+              /// --- Floating summary section ---
+              Positioned(
+                top: isSmallScreen ? 70 : 80,
+                left: isSmallScreen ? 12 : 17,
+                right: isSmallScreen ? 12 : 17,
+                child: const UtangSummarySection(),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
