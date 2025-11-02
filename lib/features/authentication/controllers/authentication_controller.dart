@@ -344,7 +344,6 @@ class AuthenticationController extends GetxController {
     required String address,
   }) async {
     try {
-      // Generate unique QR data
       String qrData = 'utrack://user/$uid?email=$email';
 
       await _firestore.collection('Users').doc(uid).set({
@@ -359,6 +358,14 @@ class AuthenticationController extends GetxController {
         'emailVerified': true,
         'qrCode': 'utrack://user/$uid?email=$email',
         'qrCreatedAt': FieldValue.serverTimestamp(),
+        // ADD THESE LINES:
+        'paymentStats': {
+          'totalLent': 0.0,
+          'totalOwed': 0.0,
+          'lenderCount': 0,
+          'borrowerCount': 0,
+          'lastUpdated': FieldValue.serverTimestamp(),
+        }
       });
 
       print('✅ User created with QR code: $qrData');
@@ -718,16 +725,24 @@ class AuthenticationController extends GetxController {
             'firstName': user.displayName?.split(' ')[0] ?? 'User',
             'lastName': user.displayName?.split(' ').skip(1).join(' ') ?? '',
             'email': user.email,
-            'phoneNumber': 'Not set', // Will be filled in profile completion
-            'address': 'Not set', // Will be filled in profile completion
+            'phoneNumber': 'Not set',
+            'address': 'Not set',
             'createdAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
             'emailVerified': true,
             'signInMethod': 'google',
+            // ADD THESE LINES:
+            'paymentStats': {
+              'totalLent': 0.0,
+              'totalOwed': 0.0,
+              'lenderCount': 0,
+              'borrowerCount': 0,
+              'lastUpdated': FieldValue.serverTimestamp(),
+            }
           });
 
           print('✅ New Google user saved to Firestore');
-        } else {
+        }else {
           // Existing user - update last login
           print('👤 Existing user, updating login time...');
 

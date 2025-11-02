@@ -1,9 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../../navigation_menu.dart';
+import '../../../../../services/payment_tracking_service.dart';
 
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
@@ -288,6 +294,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             builder: (context) => PaymentCheckoutScreen(
               paymentLink: paymentLink,
               recipientId: widget.recipientId,
+              recipientName: '${widget.recipientData['firstName']} ${widget.recipientData['lastName']}',
               amount: double.parse(amount),
             ),
           ),
@@ -383,14 +390,17 @@ class PayMongoService {
 }
 
 /// Payment Checkout Screen
+/// Payment Checkout Screen
 class PaymentCheckoutScreen extends StatefulWidget {
   final String paymentLink;
   final String recipientId;
+  final String recipientName;
   final double amount;
 
   const PaymentCheckoutScreen({
     required this.paymentLink,
     required this.recipientId,
+    required this.recipientName,
     required this.amount,
   });
 
@@ -399,6 +409,8 @@ class PaymentCheckoutScreen extends StatefulWidget {
 }
 
 class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
+  bool _paymentCompleted = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -436,7 +448,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () async {
+                onPressed: _paymentCompleted ? null : () async {
                   final Uri url = Uri.parse(widget.paymentLink);
                   try {
                     if (await canLaunchUrl(url)) {
@@ -444,6 +456,11 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
                         url,
                         mode: LaunchMode.externalApplication,
                       );
+
+                      // Show confirmation dialog after opening payment
+                      if (mounted) {
+                        _showPaymentConfirmation();
+                      }
                     } else {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -466,20 +483,129 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
                     horizontal: 40,
                     vertical: 15,
                   ),
+                  disabledBackgroundColor: Colors.grey,
                 ),
-                child: const Text(
-                  'Go to Payment',
-                  style: TextStyle(
+                child: Text(
+                  _paymentCompleted ? 'Payment Recorded ✓' : 'Go to Payment',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
               ),
+              if (_paymentCompleted) ...[
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.offAll(() => NavigationMenu());
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 15,
+                    ),
+                  ),
+                  child: const Text(
+                    'Back to Home',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ]
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _showPaymentConfirmation() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Payment Confirmation'),
+            content: const Text('Did you complete the payment?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('No, Go Back'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _recordPayment();
+                },
+                child: const Text('Yes, Confirm Payment'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  // In your PaymentTrackingService, make sure recordPayment() updates the stats:
+
+  Future<void> _recordPayment() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not authenticated')),
+        );
+        return;
+      }
+
+      // Call the PaymentTrackingService method
+      bool success = await PaymentTrackingService.recordPayment(
+        senderId: currentUser.uid,
+        recipientId: widget.recipientId,
+        recipientName: widget.recipientName,
+        amount: widget.amount,
+        paymentMethod: 'paymongo',
+      );
+
+      if (success) {
+        // Update contact counts
+        await PaymentTrackingService.updateContactCounts(currentUser.uid);
+
+        setState(() => _paymentCompleted = true);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Payment recorded successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to record payment'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
