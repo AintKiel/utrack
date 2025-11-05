@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:utrack/features/app_pages/home/creditSWidgets/creditS_screen.dart';
 
 class UCreditScore extends StatelessWidget {
   const UCreditScore({
@@ -23,21 +26,24 @@ class UCreditScore extends StatelessWidget {
           children: [
             // Circular score indicator
             SizedBox(
-              width: 120, // 👈 slightly smaller to balance avatar
+              width: 120,
               height: 120,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    value: creditScore / 100,
-                    strokeWidth: 5,
-                    backgroundColor: Colors.white.withOpacity(0.25),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      creditScore >= 80
-                          ? Colors.lightGreenAccent
-                          : creditScore >= 60
-                          ? Colors.yellowAccent
-                          : Colors.redAccent,
+                  GestureDetector(
+                    onTap: () => Get.to(() => const CreditScoreScreen()),
+                    child: CircularProgressIndicator(
+                      value: creditScore / 100,
+                      strokeWidth: 5,
+                      backgroundColor: Colors.white.withOpacity(0.25),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        creditScore >= 80
+                            ? Colors.lightGreenAccent
+                            : creditScore >= 60
+                            ? Colors.yellowAccent
+                            : Colors.redAccent,
+                      ),
                     ),
                   ),
                   Text(
