@@ -229,4 +229,20 @@ class UTexts {
   static const String qrUse = "📌 You can show this QR code to your lender or borrower to share your credit profile quickly and securely.";
   static const String download = "Download";
   static const String share = "Share";
+
+  
+  ///credit score dashboard
+  static const String creditSubTitle = "This is your borrowing reputation\nin the community";
+  static const String creditTitle1 = "Repayment Behavior";
+  static const String creditTitle2 = "Outstanding Debts";
+  static const String creditTitle3 = "Borrowing Frequency";
+  static const String creditSubTitle1 = "On-time and early payments improve your score.";
+  static const String creditSubTitle2 = "Lower debt amounts increase your score.";
+  static const String creditSubTitle3 = "Moderate borrowing is ideal";
+  static const String creditTipTitle = "Tips how to improve credit score: ";
+  static const String creditTip1 = "Pay on time or early to avoid daily −0.3% deductions and earn +0.3% bonuses.";
+  static const String creditTip2 = "Repay missed dues quickly to prevent further score and interest penalties.";
+  static const String creditTip3 = "Borrow responsibly — only take amounts you can manage within your repayment period.";
+  static const String creditTip4 = "Maintain good lender relationships to build trust and credit reliability.";
+  static const String creditTip5 = "Monitor your debts and due dates regularly using UTrack to stay consistent.";
 }
