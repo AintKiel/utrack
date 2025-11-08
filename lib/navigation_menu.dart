@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:utrack/features/app_pages/home/home_page.dart';
+import 'package:utrack/features/app_pages/loan_page/lending_page/lending_page.dart';
 import 'package:utrack/utils/constants/colors.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/helpers/helper_functions.dart';
+
+import 'features/app_pages/loan_page/loan_page.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -34,12 +37,14 @@ class NavigationMenu extends StatelessWidget {
   }
 }
 
-class NavigationController extends GetxController{
+class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
+  final Rx<int> loanPageIndex = 0.obs; // 0 = LendingPage, 1 = BorrowingPage
 
   final screens = [
     const HomePageScreen(),
-    Container(color: Colors.purple),
+    const LoanMainPage(), // This will manage Lending & Borrowing
     Container(color: Colors.orange),
-    Container(color: Colors.red),];
+    Container(color: Colors.red),
+  ];
 }

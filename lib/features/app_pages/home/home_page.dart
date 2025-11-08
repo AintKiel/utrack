@@ -43,7 +43,7 @@ class HomePageScreen extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   width: double.infinity,
-                  height: height * (isTablet ? 0.5 : 0.45),
+                  height: 400,
                   padding: EdgeInsets.symmetric(
                     vertical: isSmallScreen ? 4 : 8,
                     horizontal: isSmallScreen ? 8 : 16,

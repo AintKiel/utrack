@@ -3,7 +3,7 @@ import 'package:utrack/features/app_pages/home/qr_screen.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
 import '../../../../../utils/formatters/icons.dart';
-import '../../notifWidgets/manual_utang.dart';
+import '../totalUTracks/manual_utang.dart';
 import '../../scan_utang_form.dart';
 
 

@@ -100,7 +100,7 @@ class WhiteCreditDetails extends StatelessWidget {
                       const SizedBox(height: 7),
                       BulletText(UTexts.creditTip4),
                       const SizedBox(height: 7),
-                      BulletText(UTexts.creditTip5),
+                       BulletText(UTexts.creditTip5),
                     ],
                   ),
                 ),

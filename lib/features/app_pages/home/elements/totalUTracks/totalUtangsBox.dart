@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:utrack/features/app_pages/lending_page/lending_page.dart';
-import 'package:utrack/features/app_pages/borrowing_page/borrowing_page.dart';
+import '../../../../../navigation_menu.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
 import '../../../../../utils/formatters/iconsNoPad.dart';
+import '../../../loan_page/borrowing_page/borrowing_page.dart';
+import '../../../loan_page/lending_page/lending_page.dart';
 
 class UtangSummarySection extends StatefulWidget {
   const UtangSummarySection({super.key});
@@ -42,7 +43,8 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
               onTapDown: (_) => setState(() => _scale1 = 0.97),
               onTapUp: (_) {
                 setState(() => _scale1 = 1.0);
-                Get.to(() => const LendingPage());
+                final navController = Get.find<NavigationController>();
+                navController.selectedIndex.value = 1;
               },
               onTapCancel: () => setState(() => _scale1 = 1.0),
               child: AnimatedScale(
@@ -145,7 +147,10 @@ class _UtangSummarySectionState extends State<UtangSummarySection> {
               onTapDown: (_) => setState(() => _scale2 = 0.97),
               onTapUp: (_) {
                 setState(() => _scale2 = 1.0);
-                Get.to(() => const BorrowingPage());
+
+                final controller = Get.find<NavigationController>();
+                controller.selectedIndex.value = 1; // Go to Loan tab
+                controller.loanPageIndex.value = 1; // Show BorrowingPage
               },
               onTapCancel: () => setState(() => _scale2 = 1.0),
               child: AnimatedScale(
