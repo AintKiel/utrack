@@ -1,9 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
+import '../../../../services/loan_request_service.dart';
+import 'loan_request_notifications.dart';
 import 'notif_cards.dart';
 
 class UNotificationScreen extends StatelessWidget {
   const UNotificationScreen({super.key});
+
+  Widget _buildBorrowerNotificationCard(BuildContext context, Map<String, dynamic> notif) {
+    final isApproved = notif['type'] == 'loan_approved';
+    final color = isApproved ? Colors.green : Colors.red;
+    final icon = isApproved ? Icons.check_circle : Icons.cancel;
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () async {
+          // Mark as read when tapped
+          await LoanRequestService.markNotificationAsRead(notif['notificationId']);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notif['title'],
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      notif['message'],
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,30 +73,39 @@ class UNotificationScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Row(
-          children: [
-            const Icon(Icons.notifications_outlined, color: Colors.black87),
-            const SizedBox(width: 8),
-            Text(
-              UTexts.notif,
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.redAccent,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                "2",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
-          ],
+        title: StreamBuilder<List<Map<String, dynamic>>>(
+          stream: LoanRequestService.getLoanRequestsStream(),
+          builder: (context, snapshot) {
+            final requestCount = snapshot.data?.length ?? 0;
+            
+            return Row(
+              children: [
+                const Icon(Icons.notifications_outlined, color: Colors.black87),
+                const SizedBox(width: 8),
+                Text(
+                  UTexts.notif,
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                if (requestCount > 0) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$requestCount',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ],
+            );
+          },
         ),
         centerTitle: false,
       ),
@@ -54,7 +123,111 @@ class UNotificationScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            /// --- Notification Cards ---
+            /// --- Loan Requests Section (for lenders) ---
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: LoanRequestService.getLoanRequestsStream(),
+              builder: (context, snapshot) {
+                final requests = snapshot.data ?? [];
+                
+                if (requests.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.request_page, color: Colors.orange, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Loan Requests',
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${requests.length}',
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ...requests.map((request) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: LoanRequestCard(request: request),
+                    )),
+                    const Divider(height: 32),
+                  ],
+                );
+              },
+            ),
+
+            /// --- Borrower Notifications Section (approved/rejected) ---
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: LoanRequestService.getBorrowerNotificationsStream(),
+              builder: (context, snapshot) {
+                final notifications = snapshot.data ?? [];
+                final unreadNotifications = notifications.where((n) => n['read'] == false).toList();
+                
+                if (unreadNotifications.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.notifications_active, color: Colors.blue, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Your Loan Status',
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${unreadNotifications.length}',
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ...unreadNotifications.map((notif) => _buildBorrowerNotificationCard(context, notif)),
+                    const Divider(height: 32),
+                    Text(
+                      'Other Notifications',
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              },
+            ),
+
+            /// --- Other Notification Cards ---
             NotificationCard(
               color: Colors.redAccent.shade100.withOpacity(0.2),
               borderColor: Colors.redAccent,

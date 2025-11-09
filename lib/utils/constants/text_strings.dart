@@ -245,4 +245,9 @@ class UTexts {
   static const String creditTip3 = "Borrow responsibly — only take amounts you can manage within your repayment period.";
   static const String creditTip4 = "Maintain good lender relationships to build trust and credit reliability.";
   static const String creditTip5 = "Monitor your debts and due dates regularly using UTrack to stay consistent.";
+
+  
+  ///lending text
+  static const String noDebtors = "No debtor records yet.\nStart adding one to track lending.";
+  static const String noLenders = "No lender records yet.\nStart adding one to track borrowing.";
 }
