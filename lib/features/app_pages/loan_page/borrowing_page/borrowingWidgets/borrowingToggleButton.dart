@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../lending_page/lending_page.dart';
+import 'package:get/get.dart';
+import '../../../../../navigation_menu.dart';
 
 class BorrowingToggleButtons extends StatelessWidget {
   final bool isBorrowingSelected;
@@ -13,6 +14,8 @@ class BorrowingToggleButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<NavigationController>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
@@ -33,14 +36,8 @@ class BorrowingToggleButtons extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10),
               ),
               onPressed: () {
-                if (isBorrowingSelected) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LendingPage(),
-                    ),
-                  );
-                }
+                // ✅ Switch to LendingPage via GetX
+                controller.loanPageIndex.value = 0;
               },
               icon: Icon(
                 Icons.trending_up_rounded,
@@ -104,4 +101,3 @@ class BorrowingToggleButtons extends StatelessWidget {
     );
   }
 }
-

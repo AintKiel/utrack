@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../borrowing_page/borrowing_page.dart';
+import 'package:get/get.dart';
+import '../../../../../navigation_menu.dart';
 
 class LendingToggleButtons extends StatelessWidget {
   final bool isLendingSelected;
@@ -15,6 +16,8 @@ class LendingToggleButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<NavigationController>(); // ✅ GetX controller
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
@@ -73,15 +76,8 @@ class LendingToggleButtons extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10),
               ),
               onPressed: () {
-                onToggle(false); // update toggle state
-
-                // 👇 navigate to BorrowingPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BorrowingPage(),
-                  ),
-                );
+                // ✅ Switch page using GetX, not Navigator
+                controller.loanPageIndex.value = 1; // BorrowingPage
               },
               icon: Icon(
                 Icons.trending_down_rounded,
