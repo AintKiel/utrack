@@ -1,15 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
-import 'notif_cards.dart';
+import 'notif_elements.dart';
+import 'notif_empty.dart';
 
-class UNotificationScreen extends StatelessWidget {
+class UNotificationScreen extends StatefulWidget {
   const UNotificationScreen({super.key});
+
+  @override
+  State<UNotificationScreen> createState() => _UNotificationScreenState();
+}
+
+class _UNotificationScreenState extends State<UNotificationScreen> {
+  List<Map<String, dynamic>> notifications = [
+    // ---------- PAYMENT RELATED ----------
+    {"type": "overdue", "borrower": "Carmen Lopez", "amount": 1500.0},
+    {"type": "paymentReminder", "borrower": "Rosa Martinez", "amount": 2000.0},
+    {"type": "paymentReceived", "borrower": "M. Torres", "amount": 1200.0},
+    {"type": "paymentSent", "lender": "Anna Cruz", "amount": 800.0},
+    {"type": "upcomingPayment", "borrower": "Juan Dela Cruz", "amount": 1800.0},
+
+    // ---------- CREDIT SCORE RELATED ----------
+    {"type": "creditIncrease", "percentage": 5.0},
+    {"type": "creditDecrease", "percentage": 3.0},
+
+    // ---------- BORROWING / LENDING ----------
+    {"type": "newBorrowRequest", "borrower": "Miguel Santos", "amount": 5000.0},
+    {"type": "requestApproved", "lender": "J. Dela Cruz"},
+    {"type": "requestRejected", "lender": "Maria Reyes"},
+    {"type": "loanFullyRepaid", "borrower": "M. Torres"},
+    {"type": "loanDueSoon", "borrower": "Rosa Martinez"},
+
+    // ---------- INTEREST RELATED ----------
+    {"type": "interestAdded", "interestPercent": 2.5},
+  ];
+
+  void _removeNotification(int index) {
+    setState(() {
+      notifications.removeAt(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FB),
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -25,118 +59,118 @@ class UNotificationScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.redAccent,
-                borderRadius: BorderRadius.circular(12),
+            if (notifications.isNotEmpty)
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  notifications.length.toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ),
-              child: const Text(
-                "2",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
           ],
         ),
         centerTitle: false,
       ),
-
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: ListView(
+      body: notifications.isEmpty
+          ? const EmptyNotificationWidget()
+          : Padding(
+        padding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: ListView.builder(
           physics: const BouncingScrollPhysics(),
-          children: [
-            Text(
-              UTexts.noteSubtitle,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: Colors.grey[700],
-              ),
-            ),
-            const SizedBox(height: 16),
+          itemCount: notifications.length,
+          itemBuilder: (context, index) {
+            final n = notifications[index];
+            switch (n["type"]) {
+            // -------- PAYMENT RELATED --------
+              case "overdue":
+                return SampleNotifCards.overduePayment(
+                  borrowerName: n["borrower"],
+                  amount: (n["amount"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
+              case "paymentReminder":
+                return SampleNotifCards.paymentReminder(
+                  borrowerName: n["borrower"],
+                  amount: (n["amount"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
+              case "paymentReceived":
+                return SampleNotifCards.paymentReceived(
+                  borrowerName: n["borrower"],
+                  amount: (n["amount"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
+              case "paymentSent":
+                return SampleNotifCards.paymentSent(
+                  lenderName: n["lender"],
+                  amount: (n["amount"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
+              case "upcomingPayment":
+                return SampleNotifCards.upcomingPayment(
+                  borrowerName: n["borrower"],
+                  amount: (n["amount"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
 
-            /// --- Notification Cards ---
-            NotificationCard(
-              color: Colors.redAccent.shade100.withOpacity(0.2),
-              borderColor: Colors.redAccent,
-              icon: Icons.warning_amber_rounded,
-              title: UTexts.overduePaymentTitle,
-              message: UTexts.overduePaymentBody,
-              subtitle: "₱1,000  •   Carmen Lopez",
-              time: "2 hours ago",
-              buttonLabel: UTexts.paynow,
-              buttonColor: Colors.redAccent,
-            ),
-            NotificationCard(
-              color: Colors.orangeAccent.shade100.withOpacity(0.2),
-              borderColor: Colors.orangeAccent,
-              icon: Icons.notifications_active_outlined,
-              title: UTexts.paymentReminderTitle,
-              message: UTexts.paymentReminderBody,
-              subtitle: "₂,000  •   Rosa Martinez",
-              time: "1 day ago",
-              buttonLabel: UTexts.paynow,
-              buttonColor: Colors.orangeAccent,
-            ),
-            NotificationCard(
-              color: Colors.red.shade100.withOpacity(0.2),
-              borderColor: Colors.red,
-              icon: Icons.trending_down,
-              title: UTexts.creditScoreDecreaseTitle,
-              message: UTexts.creditScoreDecreaseBody,
-              subtitle: "-3% Credit Score",
-              time: "2 days ago",
-              buttonLabel: UTexts.viewDetails,
-              buttonColor: Colors.redAccent,
-            ),
-            NotificationCard(
-              color: Colors.greenAccent.shade100.withOpacity(0.2),
-              borderColor: Colors.green,
-              icon: Icons.check_circle_outline,
-              title: UTexts.paymentSentTitle,
-              message: UTexts.paymentSentBody,
-              subtitle: "₱800  •  to Anna Cruz",
-              time: "3 days ago",
-              buttonLabel: UTexts.viewDetails,
-              buttonColor: Colors.green,
-            ),
+            // -------- CREDIT SCORE --------
+              case "creditIncrease":
+                return SampleNotifCards.creditScoreIncrease(
+                  percentage: (n["percentage"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
+              case "creditDecrease":
+                return SampleNotifCards.creditScoreDecrease(
+                  percentage: (n["percentage"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
 
-            NotificationCard(
-              color: Colors.blueAccent.shade100.withOpacity(0.2),
-              borderColor: Colors.blueAccent,
-              icon: Icons.thumb_up_alt_outlined,
-              title: UTexts.requestApprovedTitle,
-              message: UTexts.requestApprovedBody,
-              subtitle: "₱5,000  •  Approved by J. Dela Cruz",
-              time: "5 days ago",
-              buttonLabel: UTexts.viewDetails,
-              buttonColor: Colors.blueAccent,
-            ),
+            // -------- BORROWING / LENDING --------
+              case "newBorrowRequest":
+                return SampleNotifCards.newBorrowRequest(
+                  borrowerName: n["borrower"],
+                  amount: (n["amount"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                  context: context, // 👈 Add this line
+                );
+              case "requestApproved":
+                return SampleNotifCards.requestApproved(
+                  lenderName: n["lender"],
+                  onDelete: () => _removeNotification(index),
+                );
+              case "requestRejected":
+                return SampleNotifCards.requestRejected(
+                  lenderName: n["lender"],
+                  onDelete: () => _removeNotification(index),
+                );
+              case "loanFullyRepaid":
+                return SampleNotifCards.loanFullyRepaid(
+                  borrowerName: n["borrower"],
+                  onDelete: () => _removeNotification(index),
+                );
+              case "loanDueSoon":
+                return SampleNotifCards.loanDueSoon(
+                  borrowerName: n["borrower"],
+                  onDelete: () => _removeNotification(index),
+                );
 
-            NotificationCard(
-              color: Colors.tealAccent.shade100.withOpacity(0.2),
-              borderColor: Colors.teal,
-              icon: Icons.attach_money_rounded,
-              title: UTexts.loanFullyRepaidTitle,
-              message: UTexts.loanFullyRepaidBody,
-              subtitle: "₱3,000  •  from M. Torres",
-              time: "1 week ago",
-              buttonLabel: UTexts.viewDetails,
-              buttonColor: Colors.teal,
-            ),
+            // -------- INTEREST --------
+              case "interestAdded":
+                return SampleNotifCards.interestAdded(
+                  interestPercent: (n["interestPercent"] as num).toDouble(),
+                  onDelete: () => _removeNotification(index),
+                );
 
-            NotificationCard(
-              color: Colors.purpleAccent.shade100.withOpacity(0.2),
-              borderColor: Colors.purple,
-              icon: Icons.schedule_outlined,
-              title: UTexts.loanDueSoonTitle,
-              message: UTexts.loanDueSoonBody,
-              subtitle: "₱2,500  •  due tomorrow",
-              time: "1 week ago",
-              buttonLabel: UTexts.remind,
-              buttonColor: Colors.purple,
-            ),
-            const SizedBox(height: 40),
-          ],
+              default:
+                return const SizedBox.shrink();
+            }
+          },
         ),
       ),
     );

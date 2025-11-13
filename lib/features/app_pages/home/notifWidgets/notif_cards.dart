@@ -1,121 +1,144 @@
 import 'package:flutter/material.dart';
-import '../../../../utils/constants/colors.dart';
 
 class NotificationCard extends StatelessWidget {
-  final Color color;
   final Color borderColor;
   final IconData icon;
   final String title;
-  final String message;
-  final String subtitle;
+  final Widget message;
+  final Widget subtitle;
   final String time;
-  final String buttonLabel;
-  final Color buttonColor;
+  final String? buttonLabel; // optional
+  final Color? buttonColor;  // optional
+  final VoidCallback? onButtonPressed; // optional
+  final VoidCallback? onDelete;
 
   const NotificationCard({
     super.key,
-    required this.color,
     required this.borderColor,
     required this.icon,
     required this.title,
     required this.message,
     required this.subtitle,
     required this.time,
-    required this.buttonLabel,
-    required this.buttonColor,
+    this.buttonLabel,
+    this.buttonColor,
+    this.onButtonPressed,
+    this.onDelete,
   });
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Delete Notification',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text('Are you sure you want to delete this notification?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (onDelete != null) onDelete!();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10), // smaller padding
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: UColors.white,
-        border: Border.all(color: borderColor.withOpacity(0.3), width: 0.8),
-        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12.withOpacity(0.05),
+            color: Colors.black12.withOpacity(0.03),
             blurRadius: 3,
-            offset: const Offset(0, 1.5),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// --- Title Row ---
+          // --- Header with delete icon ---
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, color: borderColor, size: 20), // slightly smaller icon
+              Icon(icon, color: borderColor, size: 18),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14, // slightly smaller
+                    fontSize: 14,
                   ),
                 ),
               ),
-              Container(
-                width: 7,
-                height: 7,
-                decoration: const BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
-                ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 18, color: Colors.grey),
+                onPressed: () => _showDeleteConfirmationDialog(context),
+                tooltip: 'Remove notification',
               ),
             ],
           ),
+          const SizedBox(height: 2),
 
-          const SizedBox(height: 4),
-          Text(
-            message,
-            style: TextStyle(color: Colors.grey[800], fontSize: 13, height: 1.2),
+          // --- Message ---
+          DefaultTextStyle(
+            style: const TextStyle(fontSize: 13, color: Colors.black87),
+            child: message,
+          ),
+          const SizedBox(height: 8),
+
+          // --- Subtitle ---
+          DefaultTextStyle(
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+            child: subtitle,
           ),
           const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 6),
 
-          /// --- Bottom Row ---
+          // --- Footer ---
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 time,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 11.5,
-                ),
+                style: const TextStyle(fontSize: 11, color: Colors.grey),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap, // removes extra height
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+
+              // show button only if provided
+              if (buttonLabel != null && buttonColor != null)
+                ElevatedButton(
+                  onPressed: onButtonPressed ?? () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    buttonLabel!,
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
                   ),
                 ),
-                onPressed: () {},
-                child: Text(
-                  buttonLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
             ],
           ),
         ],
