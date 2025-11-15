@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/loan_request_service.dart';
+import '../../../services/notification_service.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/formatters/icons.dart';
 
@@ -16,14 +16,10 @@ class Notification_Widget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: LoanRequestService.getLoanRequestsStream(),
-      builder: (context, loanRequestSnapshot) {
-        return StreamBuilder<List<Map<String, dynamic>>>(
-          stream: LoanRequestService.getBorrowerNotificationsStream(),
-          builder: (context, borrowerNotifSnapshot) {
-            final loanRequestCount = loanRequestSnapshot.data?.length ?? 0;
-            final borrowerNotifCount = borrowerNotifSnapshot.data?.where((n) => n['read'] == false).length ?? 0;
-            final totalCount = loanRequestCount + borrowerNotifCount;
+      stream: NotificationService.getNotificationsStream(),
+      builder: (context, notificationSnapshot) {
+        final totalCount = notificationSnapshot.data?.length ?? 0;
+        print('🔔 Notification badge count: $totalCount');
             
             return Stack(
               children: [
@@ -55,8 +51,6 @@ class Notification_Widget extends StatelessWidget {
                   ),
               ],
             );
-          },
-        );
       },
     );
   }

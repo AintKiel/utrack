@@ -79,6 +79,9 @@ class UIcons {
   static Widget password({double size = regular, Color? color}) =>
       _icon("password", size: size, color: color);
 
+  static Widget pesoSign({double size = regular, Color? color}) =>
+      _icon("pesoSign", size: size, color: color);
+
   static Widget phone({double size = regular, Color? color}) =>
       _icon("phone", size: size, color: color);
 

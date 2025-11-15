@@ -9,7 +9,7 @@ import '../../../../../utils/helpers/helper_functions.dart';
 class RecentActivity extends StatefulWidget {
   const RecentActivity({super.key});
 
-  @override
+  // ... rest of the code remains the same ...
   State<RecentActivity> createState() => _RecentActivityState();
 }
 
@@ -176,7 +176,32 @@ class _RecentActivityState extends State<RecentActivity> {
                         initials: _getInitials(name),
                         name: name,
                         time: _getTimeAgo(createdAt),
-                        amount: isLent ? '+₱$amount' : '-₱$amount',
+                        amount: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              isLent ? '+' : '-',
+                              style: TextStyle(
+                                color: isLent ? Colors.green : Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            UIconsNoPad.pesoSign(
+                              size: 14, 
+                              color: isLent ? Colors.green : Colors.red,
+                            ),
+                            Text(
+                              amount.toString(),
+                              style: TextStyle(
+                                color: isLent ? Colors.green : Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                         amountColor: isLent ? Colors.green : Colors.red,
                         icon: isLent
                             ? UIconsNoPad.paid(color: Colors.green, size: 14)

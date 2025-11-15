@@ -175,48 +175,64 @@ class UTexts {
   static const String noteSubtitle= "Ratings in good condition";
   static const String goodConditon = "Keep it up!";
 
-  ///-------notif texts---------
+   /// ------- Notifications ---------x
   static const String notif = "Notifications";
-  static const String notifSubTitle = "Stay updated on your lending and borrowing activities";
+  static const String notifSubTitle =
+      "Stay updated on your lending and borrowing activities.";
 
-  // --- Payment Related ---
+// Payment Related
   static const String overduePaymentTitle = "Overdue Payment Alert";
-  static const String overduePaymentBody = "Your debt is overdue. This is affecting your credit score.";
-
+  static const String overduePaymentBody =
+      "Your payment for {loanTitle} is now overdue. Please settle it soon to avoid credit score deductions.";
   static const String paymentReminderTitle = "Payment Reminder";
-  static const String paymentReminderBody = "You have a pending payment reminder from your lender.";
-
-  static const String paymentReceivedTitle = "Payment Received";
-  static const String paymentReceivedBody = "You received a payment from your borrower.";
-
-  static const String paymentSentTitle = "Payment Sent";
-  static const String paymentSentBody = "You successfully paid your lender.";
-
+  static const String paymentReminderBody =
+      "Your payment for {loanTitle} is due in 2 days. Pay on time to maintain your good credit standing.";
+  static const String paymentReceivedTitle = "Repayment Received";
+  static const String paymentReceivedBody =
+      "{borrowerName} has sent a repayment of {amount}. Check your transaction details for confirmation.";
+  static const String paymentSentTitle = "Repayment Sent";
+  static const String paymentSentBody =
+      "You successfully sent a repayment of {amount} to {lenderName}. Thank you for paying on time!";
   static const String upcomingPaymentTitle = "Upcoming Payment Due";
-  static const String upcomingPaymentBody = "Your next payment is due soon. Don’t forget to pay on time!";
+  static const String upcomingPaymentBody =
+      "You have an upcoming due date for {loanTitle}. Stay on track and avoid overdue penalties!";
 
-  // --- Credit Score Related ---
-  static const String creditScoreIncreaseTitle = "Credit Score Increased";
-  static const String creditScoreIncreaseBody = "Your credit score improved due to consistent payments.";
+// Credit Score Related
+  static const String creditScoreIncreaseTitle = "Credit Score Increased 🎉";
+  static const String creditScoreIncreaseBody =
+      "Great job! Your credit score increased by {percentage}% due to consistent and timely payments.";
 
-  static const String creditScoreDecreaseTitle = "Credit Score Decreased";
-  static const String creditScoreDecreaseBody = "Your credit score dropped due to overdue payments.";
+  static const String creditScoreDecreaseTitle = "Credit Score Decreased ⚠️";
+  static const String creditScoreDecreaseBody =
+      "Your credit score dropped by {percentage}% due to missed or overdue payments. Try to settle soon to recover points.";
 
-  // --- Borrowing / Lending ---
-  static const String newBorrowRequestTitle = "New Borrowing Request";
-  static const String newBorrowRequestBody = "Someone requested to borrow money from you.";
+// Borrowing / Lending
+  static const String newBorrowRequestTitle = "New Borrow Request";
+  static const String newBorrowRequestBody =
+      "{borrowerName} wants to borrow {amount} from you. Review and respond to their request.";
 
-  static const String requestApprovedTitle = "Request Approved";
-  static const String requestApprovedBody = "Your lending request has been approved.";
+  static const String requestApprovedTitle = "Request Approved ✅";
+  static const String requestApprovedBody =
+      "Good news! Your lending request to {lenderName} has been approved.";
 
-  static const String requestRejectedTitle = "Request Rejected";
-  static const String requestRejectedBody = "Your lending request was declined.";
+  static const String requestRejectedTitle = "Request Declined";
+  static const String requestRejectedBody =
+      "Unfortunately, your lending request to {lenderName} was declined.";
 
-  static const String loanFullyRepaidTitle = "Utang Fully Paid";
-  static const String loanFullyRepaidBody = "Your borrower has fully paid their utang.";
+  static const String loanFullyRepaidTitle = "Loan Fully Repaid 🎯";
+  static const String loanFullyRepaidBody =
+      "Your borrower, {borrowerName}, has fully repaid their utang. Great job on completing the transaction!";
 
-  static const String loanDueSoonTitle = "Loan Due Soon";
-  static const String loanDueSoonBody = "One of your borrower’s repayments is due tomorrow.";
+  static const String loanDueSoonTitle = "Loan Due Soon ⏰";
+  static const String loanDueSoonBody =
+      "Reminder: {borrowerName}’s repayment is due tomorrow. Make sure to confirm once payment is received.";
+
+  // Empty Notif
+  static const String noNotifTitle = "No Recent Notifications";
+  static const String noNotifBody = "You don’t have any new updates right now. Check back later for lending or borrowing activity.";
+
+  
+  
 
   ///qr code texts
   static const String qrCode = "QR Code";

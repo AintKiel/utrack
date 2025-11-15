@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../utils/constants/colors.dart';
 import '../../../../utils/constants/text_strings.dart';
+import '../../../../services/enhanced_credit_service.dart';
 import 'circle_Credit.dart';
 
 class CreditScoreScreen extends StatefulWidget {
@@ -17,7 +18,9 @@ class CreditScoreScreen extends StatefulWidget {
 class _CreditScoreScreenState extends State<CreditScoreScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _waveController;
-  final double progress = 0.75; // 75%
+  double? progress; // Will be updated from enhanced credit data
+  String? creditTier;
+  String? tierEmoji;
   
   late Stream<DocumentSnapshot> _userDataStream;
 
@@ -36,8 +39,33 @@ class _CreditScoreScreenState extends State<CreditScoreScreen>
           .doc(user.uid)
           .snapshots();
       
-      // Initialize creditData if it doesn't exist
+      // Initialize enhanced credit data and load credit score
+      _initializeEnhancedCreditData(user.uid);
       _initializeCreditData(user.uid);
+    }
+  }
+  
+  /// Initialize enhanced credit data and load credit score
+  Future<void> _initializeEnhancedCreditData(String userId) async {
+    try {
+      await EnhancedCreditService.initializeEnhancedCreditData(userId);
+      
+      // Load current credit score and tier
+      final creditInfo = await EnhancedCreditService.getEnhancedCreditScore(userId);
+      
+      if (mounted) {
+        setState(() {
+          progress = (creditInfo['creditScore'] ?? 100.0) / 100.0; // Convert percentage to progress (0-1)
+          creditTier = creditInfo['tier'] ?? 'Excellent';
+          tierEmoji = creditInfo['tierEmoji'] ?? '🟢';
+        });
+      }
+      
+      // Process any overdue loans
+      await EnhancedCreditService.processOverdueLoans();
+      
+    } catch (e) {
+      print('❌ Error initializing enhanced credit data: $e');
     }
   }
   
@@ -70,6 +98,97 @@ class _CreditScoreScreenState extends State<CreditScoreScreen>
     } catch (e) {
       print('❌ Error initializing credit data: $e');
     }
+  }
+
+  /// Build credit tier display card
+  Widget _buildCreditTierCard() {
+    Color tierColor;
+    String tierDescription;
+    
+    switch (creditTier) {
+      case 'Excellent':
+        tierColor = Colors.green;
+        tierDescription = 'Trusted borrower';
+        break;
+      case 'Good':
+        tierColor = Colors.orange;
+        tierDescription = 'Reliable, minor delays';
+        break;
+      case 'Fair':
+        tierColor = Colors.amber;
+        tierDescription = 'Often delayed';
+        break;
+      case 'Poor':
+        tierColor = Colors.red;
+        tierDescription = 'High risk borrower';
+        break;
+      default:
+        tierColor = Colors.grey;
+        tierDescription = 'Unknown status';
+    }
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: tierColor.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: tierColor.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Text(
+            tierEmoji ?? '🟢',
+            style: const TextStyle(fontSize: 32),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${creditTier ?? 'Excellent'} Tier',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: tierColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  tierDescription,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: progress ?? 1.0,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(tierColor),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${((progress ?? 1.0) * 100).toStringAsFixed(1)}% Credit Score',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -138,7 +257,7 @@ class _CreditScoreScreenState extends State<CreditScoreScreen>
                   bottom: -80,
                   child: CircleCreditScore(
                     waveController: _waveController,
-                    progress: progress,
+                    progress: progress ?? 1.0,
                   ),
                 ),
               ],
@@ -146,6 +265,13 @@ class _CreditScoreScreenState extends State<CreditScoreScreen>
 
             // ===== White body content (scrollable) =====
             const SizedBox(height: 100),
+            
+            // Credit Tier Display
+            if (progress != null && creditTier != null && tierEmoji != null) ...[
+              _buildCreditTierCard(),
+              const SizedBox(height: 16),
+            ],
+            
             // Real-time data from Firestore
             StreamBuilder<DocumentSnapshot>(
               stream: _userDataStream,

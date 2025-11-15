@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../services/loan_request_service.dart';
+import '../../../../services/enhanced_credit_service.dart';
 
 class RequestUtangPopup extends StatefulWidget {
   const RequestUtangPopup({super.key});
@@ -63,8 +64,10 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
       _showError('Please enter an amount');
       return;
     }
-    if (repaymentType == 'Single Repayment' && dueDateController.text.trim().isEmpty) {
-      _showError('Please enter a due date');
+    if (dueDateController.text.trim().isEmpty) {
+      _showError(repaymentType == 'Single Repayment' 
+          ? 'Please enter a due date' 
+          : 'Please enter a start date');
       return;
     }
     if (repaymentType == 'Multiple Repayment' && countOfGivesController.text.trim().isEmpty) {
@@ -78,19 +81,45 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
       return;
     }
 
+    // Validate 21-day limit for single repayment
+    if (repaymentType == 'Single Repayment') {
+      final dueDate = _parseDateString(dueDateController.text.trim());
+      if (dueDate != null) {
+        if (!EnhancedCreditService.isValidDueDate(dueDate)) {
+          _showError('Due date must be between 1-21 days from today');
+          return;
+        }
+      } else {
+        _showError('Please enter a valid date (dd/mm/yyyy)');
+        return;
+      }
+    }
+
+    // Auto-calculate interest for multiple repayment
+    double? finalInterest;
+    if (repaymentType == 'Multiple Repayment') {
+      final installmentCount = int.tryParse(countOfGivesController.text.trim());
+      if (installmentCount != null && installmentCount > 0) {
+        finalInterest = EnhancedCreditService.calculateInstallmentInterest(installmentCount);
+      }
+    } else {
+      // Use manual interest for single repayment if provided
+      if (interestController.text.trim().isNotEmpty) {
+        finalInterest = double.tryParse(interestController.text.trim());
+      }
+    }
+
     setState(() => isLoading = true);
 
     final result = await LoanRequestService.requestLoan(
       lenderUserId: userIdController.text.trim(),
       amount: amount,
       repaymentType: repaymentType,
-      dueDate: repaymentType == 'Single Repayment' ? dueDateController.text.trim() : null,
+      dueDate: dueDateController.text.trim(), // Pass date for both types
       installmentCount: repaymentType == 'Multiple Repayment' 
           ? int.tryParse(countOfGivesController.text.trim()) 
           : null,
-      interestRate: interestController.text.trim().isNotEmpty 
-          ? double.tryParse(interestController.text.trim()) 
-          : null,
+      interestRate: finalInterest,
       notes: noteController.text.trim().isNotEmpty ? noteController.text.trim() : null,
     );
 
@@ -98,6 +127,11 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
 
     if (result['success'] == true) {
       if (mounted) {
+        // The loan request was created successfully
+        // The LoanRequestService already created the notification in the lender's collection
+        // We don't need to generate notifications here since it's already done
+        print('✅ Loan request created - notification already sent to lender');
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('✅ Loan request sent to ${result['lenderName']}!'),
@@ -115,10 +149,58 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ $message'),
+          content: Text(message),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
         ),
       );
+    }
+  }
+
+  /// Parse date string (dd/mm/yyyy) to DateTime
+  DateTime? _parseDateString(String dateStr) {
+    try {
+      final parts = dateStr.split('/');
+      if (parts.length == 3) {
+        final day = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final year = int.parse(parts[2]);
+        return DateTime(year, month, day);
+      }
+    } catch (e) {
+      // Invalid date format
+    }
+    return null;
+  }
+
+  /// Show date picker and update the date controller
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)), // 1 year from now
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue, // Your app's primary color
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      // Format date as dd/mm/yyyy
+      final formattedDate = "${picked.day.toString().padLeft(2, '0')}/"
+          "${picked.month.toString().padLeft(2, '0')}/"
+          "${picked.year}";
+      controller.text = formattedDate;
     }
   }
 
@@ -205,23 +287,67 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
                 if (repaymentType == "Single Repayment")
                   _buildTextField("Preferred Due Date*", "dd/mm/yyyy",
                       controller: dueDateController,
-                      suffixIcon: Icons.calendar_today),
+                      suffixIcon: Icons.calendar_today,
+                      isDateField: true),
 
                 if (repaymentType == "Multiple Repayment")
-                  Row(
+                  Column(
                     children: [
-                      Expanded(
-                        child: _buildTextField("Installment Count*",
-                            "Enter number of payments",
-                            controller: countOfGivesController,
-                            keyboardType: TextInputType.number),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildTextField("Installment Count*",
+                                "Enter number of months",
+                                controller: countOfGivesController,
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  final months = int.tryParse(value);
+                                  if (months != null && months > 0) {
+                                    final interest = EnhancedCreditService.calculateInstallmentInterest(months);
+                                    interestController.text = interest.toString();
+                                  } else {
+                                    interestController.text = '';
+                                  }
+                                }),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildTextField("Interest (%) - Auto",
+                                "Auto-calculated",
+                                controller: interestController,
+                                keyboardType: TextInputType.number,
+                                enabled: false),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildTextField("Interest (%)",
-                            "Enter interest percentage",
-                            controller: interestController,
-                            keyboardType: TextInputType.number),
+                      const SizedBox(height: 14),
+                      _buildTextField("Start Date*", "dd/mm/yyyy",
+                          controller: dueDateController,
+                          suffixIcon: Icons.calendar_today,
+                          isDateField: true),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blue.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.blue.shade600, size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Interest = (Months + 1)%. Example: 3 months = 4% interest',
+                                style: TextStyle(
+                                  color: Colors.blue.shade700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -323,6 +449,8 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
         int maxLines = 1,
         IconData? suffixIcon,
         Function(String)? onChanged,
+        bool enabled = true,
+        bool isDateField = false,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,18 +464,27 @@ class _RequestUtangPopupState extends State<RequestUtangPopup> {
           keyboardType: keyboardType,
           maxLines: maxLines,
           onChanged: onChanged,
-          style: const TextStyle(fontSize: 14, color: Colors.black87),
+          enabled: enabled,
+          style: TextStyle(
+            fontSize: 14, 
+            color: enabled ? Colors.black87 : Colors.grey[600],
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(fontSize: 13, color: Colors.black38),
             suffixIcon: suffixIcon != null
-                ? Icon(suffixIcon, size: 18, color: Colors.grey[500])
+                ? (isDateField 
+                    ? GestureDetector(
+                        onTap: () => _selectDate(context, controller!),
+                        child: Icon(suffixIcon, size: 18, color: Colors.grey[500]),
+                      )
+                    : Icon(suffixIcon, size: 18, color: Colors.grey[500]))
                 : null,
             isDense: true, // makes height smaller
             contentPadding:
             const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
             filled: true,
-            fillColor: Colors.transparent,
+            fillColor: enabled ? Colors.transparent : Colors.grey[50],
             border: const UnderlineInputBorder(
               borderSide: BorderSide(color: Color(0xFFE0E0E0)),
             ),

@@ -18,7 +18,7 @@ class RecentActItems extends StatelessWidget {
   final String initials;
   final String name;
   final String time;
-  final String amount;
+  final Widget amount;
   final Color amountColor;
   final Widget icon;
   final Color iconColor;
@@ -85,13 +85,7 @@ class RecentActItems extends StatelessWidget {
           ),
 
           // Amount
-          Text(
-            amount,
-            style: TextStyle(
-              color: amountColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          amount,
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'notification_service.dart';
 
 class LoanRequestService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -68,7 +69,25 @@ class LoanRequestService {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      // Also create a notification in the Notifications collection for the lender
+      await NotificationService.createNotification(
+        userId: lenderUserId,
+        type: 'newBorrowRequest',
+        title: 'New Borrow Request',
+        message: '$borrowerName wants to borrow ₱${amount.toStringAsFixed(2)}',
+        data: {
+          'amount': amount,
+          'borrowerName': borrowerName,
+          'borrowerId': currentUser.uid,
+          'requestId': requestId,
+          'repaymentType': repaymentType,
+          'dueDate': dueDate,
+          'notes': notes,
+        },
+      );
+
       print('✅ Loan request notification sent!');
+      print('📬 Notification created in lender\'s Notifications collection');
       return {
         'success': true,
         'requestId': requestId,
@@ -207,24 +226,15 @@ class LoanRequestService {
       await _updateContactCounts(borrowerId);
 
       // Send notification to borrower that request was APPROVED
-      await _firestore
-          .collection('Users')
-          .doc(borrowerId)
-          .collection('Notifications')
-          .add({
-        'type': 'loan_approved',
-        'title': 'Loan Request Approved! 🎉',
-        'message': '$lenderName approved your loan request of ₱$amount',
-        'lenderName': lenderName,
-        'lenderId': currentUser.uid,
-        'amount': amount,
-        'transactionId': transactionId,
-        'read': false,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      print('📬 Sending approval notification to borrower: $borrowerId');
+      await NotificationService.notifyRequestApproved(
+        borrowerId: borrowerId,
+        lenderName: lenderName,
+        amount: amount,
+      );
 
       print('✅ Loan request approved and transactions created!');
-      print('📬 Notification sent to borrower');
+      print('📬 Approval notification sent to borrower: $borrowerName');
       return {
         'success': true,
         'transactionId': transactionId,
@@ -275,23 +285,15 @@ class LoanRequestService {
       });
 
       // Send notification to borrower that request was REJECTED
-      await _firestore
-          .collection('Users')
-          .doc(borrowerId)
-          .collection('Notifications')
-          .add({
-        'type': 'loan_rejected',
-        'title': 'Loan Request Declined',
-        'message': '$lenderName declined your loan request of ₱$amount',
-        'lenderName': lenderName,
-        'lenderId': currentUser.uid,
-        'amount': amount,
-        'read': false,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      print('📬 Sending rejection notification to borrower: $borrowerId');
+      await NotificationService.notifyRequestRejected(
+        borrowerId: borrowerId,
+        lenderName: lenderName,
+        amount: amount,
+      );
 
       print('✅ Loan request rejected');
-      print('📬 Notification sent to borrower');
+      print('📬 Rejection notification sent to borrower: $borrowerName');
       return {'success': true};
     } catch (e) {
       print('❌ Error rejecting loan request: $e');
