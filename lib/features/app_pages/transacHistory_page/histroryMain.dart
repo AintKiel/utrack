@@ -1,189 +1,190 @@
 import 'package:flutter/material.dart';
-import '../../../../utils/formatters/iconsNoPad.dart';
+import 'package:intl/intl.dart';
+import 'searchBar.dart';
+import 'transacContainer.dart';
 
-class TransacContainer extends StatelessWidget {
+class TransactionModel {
   final String name;
   final String type; // Lent, Borrowed, Received, Paid
   final String status; // Completed, Pending, Failed
   final double amount;
-  final String date;
-  final String time;
+  final DateTime dateTime; // combined date+time for sorting
 
-  const TransacContainer({
-    super.key,
+  TransactionModel({
     required this.name,
     required this.type,
     required this.status,
     required this.amount,
-    required this.date,
-    required this.time,
+    required this.dateTime,
   });
+}
 
-  // Convert type to readable label
-  String getTypeLabel() {
-    switch (type.toLowerCase()) {
-      case "lent":
-        return "Money Lent";
-      case "borrowed":
-        return "Borrowed Money";
-      case "paid":
-        return "Payment Paid";
-      case "received":
-        return "Received Payment";
-      default:
-        return "Transaction";
-    }
+class HistoryMain extends StatefulWidget {
+  const HistoryMain({super.key});
+
+  @override
+  State<HistoryMain> createState() => _HistoryMainState();
+}
+
+class _HistoryMainState extends State<HistoryMain> {
+  // sample data
+  final List<TransactionModel> _allTransactions = [
+    TransactionModel(
+      name: 'Ana Garcia',
+      type: 'Received',
+      status: 'Completed',
+      amount: 2000,
+      dateTime: DateFormat('MM/dd/yyyy hh:mm a').parse('12/15/2024 06:30 PM'),
+    ),
+    TransactionModel(
+      name: 'Pedro Reyes',
+      type: 'Lent',
+      status: 'Completed',
+      amount: 500,
+      dateTime: DateFormat('MM/dd/yyyy hh:mm a').parse('12/14/2024 11:20 AM'),
+    ),
+    TransactionModel(
+      name: 'Rosa Martinez',
+      type: 'Borrowed',
+      status: 'Completed',
+      amount: 1500,
+      dateTime: DateFormat('MM/dd/yyyy hh:mm a').parse('12/13/2024 05:15 PM'),
+    ),
+    TransactionModel(
+      name: 'Juan Dela Cruz',
+      type: 'Paid',
+      status: 'Pending',
+      amount: 750,
+      dateTime: DateFormat('MM/dd/yyyy hh:mm a').parse('12/18/2024 02:00 PM'),
+    ),
+    TransactionModel(
+      name: 'Maria Lopez',
+      type: 'Received',
+      status: 'Failed',
+      amount: 300,
+      dateTime: DateFormat('MM/dd/yyyy hh:mm a').parse('12/16/2024 09:10 AM'),
+    ),
+  ];
+
+  List<TransactionModel> _filtered = [];
+  String _searchText = '';
+  String _sort = 'Recent';
+  String _type = 'All Types';
+  String _status = 'All Status';
+
+  @override
+  void initState() {
+    super.initState();
+    _filtered = List.from(_allTransactions);
+    _applyFilters();
   }
 
-  Color getAmountColor() {
-    switch (type.toLowerCase()) {
-      case "received":
-        return Colors.green;
-      case "lent":
-        return Colors.blue;
-      case "paid":
-        return Colors.purple;
-      case "borrowed":
-        return Colors.orange;
-      default:
-        return Colors.black87;
-    }
+  void _onFilterChanged(String sort, String type, String status) {
+    setState(() {
+      _sort = sort;
+      _type = type;
+      _status = status;
+      _applyFilters();
+    });
   }
 
-  IconData getTypeIcon() {
-    switch (type.toLowerCase()) {
-      case "received":
-        return Icons.arrow_downward_rounded;
-      case "lent":
-        return Icons.arrow_outward_rounded;
-      case "paid":
-        return Icons.payments_rounded;
-      case "borrowed":
-        return Icons.arrow_upward_rounded;
-      default:
-        return Icons.receipt_long;
-    }
+  void _onSearchChanged(String value) {
+    setState(() {
+      _searchText = value;
+      _applyFilters();
+    });
   }
 
-  Color getStatusColor() {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return Colors.green;
-      case "pending":
-        return Colors.grey;
-      case "failed":
-        return Colors.red;
-      default:
-        return Colors.black;
+  void _applyFilters() {
+    // start from all
+    List<TransactionModel> list = List.from(_allTransactions);
+
+    // search
+    if (_searchText.trim().isNotEmpty) {
+      final q = _searchText.toLowerCase();
+      list = list.where((t) => t.name.toLowerCase().contains(q)).toList();
     }
+
+    // type filter
+    if (_type != 'All Types') {
+      list = list.where((t) => t.type.toLowerCase() == _type.toLowerCase()).toList();
+    }
+
+    // status filter
+    if (_status != 'All Status') {
+      list = list.where((t) => t.status.toLowerCase() == _status.toLowerCase()).toList();
+    }
+
+    // sort
+    switch (_sort) {
+      case 'Recent':
+        list.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+        break;
+      case 'Amount':
+        list.sort((a, b) => b.amount.compareTo(a.amount));
+        break;
+      case 'Name':
+        list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        break;
+      default:
+        list.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    }
+
+    _filtered = list;
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        titleSpacing: 35,   // adds left padding
+        title: const Text(
+          'History',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
             children: [
-              // Icon circle
-              CircleAvatar(
-                backgroundColor: getAmountColor().withOpacity(0.15),
-                radius: 20,
-                child: Icon(getTypeIcon(), color: getAmountColor(), size: 24),
+              HistorySearchBar(
+                onFilterChanged: _onFilterChanged,
+                onSearchChanged: _onSearchChanged,
               ),
-              const SizedBox(width: 12),
-
-              // NAME + TYPE LABEL + DATE
+              const SizedBox(height: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                    ),
-
-                    const SizedBox(height: 2),
-
-                    Text(
-                      getTypeLabel(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.grey.shade400 : Colors.grey,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      "$date • $time",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.grey.shade500 : Colors.grey,
-                      ),
-                    ),
-                  ],
+                child: _filtered.isEmpty
+                    ? const Center(child: Text('No transactions found'))
+                    : ListView.builder(
+                  itemCount: _filtered.length,
+                  itemBuilder: (context, index) {
+                    final t = _filtered[index];
+                    // split date/time display
+                    final date = DateFormat('MM/dd/yyyy').format(t.dateTime);
+                    final time = DateFormat('hh:mm a').format(t.dateTime);
+                    return TransacContainer(
+                      name: t.name,
+                      type: t.type,
+                      status: t.status,
+                      amount: t.amount,
+                      date: date,
+                      time: time,
+                    );
+                  },
                 ),
-              ),
-
-              // AMOUNT WITH PESO ICON
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  UIconsNoPad.pesoSign(size: 15, color: getAmountColor()),
-                  const SizedBox(width: 4),
-                  Text(
-                    amount.toStringAsFixed(2),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: getAmountColor(),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
-
-          const SizedBox(height: 10),
-
-          // STATUS CHIP
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: getStatusColor().withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                status,
-                style: TextStyle(
-                  color: getStatusColor(),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
