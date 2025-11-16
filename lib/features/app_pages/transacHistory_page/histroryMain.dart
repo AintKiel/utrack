@@ -140,8 +140,8 @@ class _HistoryMainState extends State<HistoryMain> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black,
         titleSpacing: 35,   // adds left padding
         title: const Text(
           'History',
