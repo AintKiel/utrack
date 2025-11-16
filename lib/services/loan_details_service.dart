@@ -28,23 +28,46 @@ class LoanDetailsService {
       final phone = userData['phoneNumber'] ?? '';
       final address = userData['address'] ?? '';
 
-      // Get transactions
-      final collection = isLending ? 'LentTransactions' : 'OwedTransactions';
-      final userIdField = isLending ? 'recipientId' : 'senderId';
+      late final List<QueryDocumentSnapshot<Map<String, dynamic>>> transactionDocs;
 
-      final transactionsSnapshot = await _firestore
-          .collection('Users')
-          .doc(currentUser.uid)
-          .collection(collection)
-          .where(userIdField, isEqualTo: userId)
-          .orderBy('createdAt', descending: true)
-          .get();
+      if (isLending) {
+        // Use global Transactions so lender view reflects borrower repayments immediately
+        final snapshot = await _firestore
+            .collection('Transactions')
+            .where('senderId', isEqualTo: currentUser.uid)
+            .get();
+
+        transactionDocs = snapshot.docs
+            .where((doc) => doc.data()['recipientId'] == userId)
+            .toList()
+          ..sort((a, b) {
+            final aDate = a.data()['createdAt'];
+            final bDate = b.data()['createdAt'];
+            final aTs = aDate is Timestamp ? aDate : null;
+            final bTs = bDate is Timestamp ? bDate : null;
+
+            if (aTs == null && bTs == null) return 0;
+            if (aTs == null) return 1;
+            if (bTs == null) return -1;
+            return bTs.compareTo(aTs); // descending
+          });
+      } else {
+        final snapshot = await _firestore
+            .collection('Users')
+            .doc(currentUser.uid)
+            .collection('OwedTransactions')
+            .where('senderId', isEqualTo: userId)
+            .orderBy('createdAt', descending: true)
+            .get();
+
+        transactionDocs = snapshot.docs;
+      }
 
       double totalAmount = 0.0;
       List<Map<String, dynamic>> transactions = [];
       List<Map<String, dynamic>> dueDates = [];
 
-      for (var doc in transactionsSnapshot.docs) {
+      for (var doc in transactionDocs) {
         final data = doc.data();
         final amount = (data['amount'] ?? 0.0).toDouble();
         final status = data['status'] as String? ?? 'active';
@@ -53,23 +76,36 @@ class LoanDetailsService {
         final repaymentType = data['repaymentType'] as String? ?? 'Single Repayment';
         final interestRate = (data['interestRate'] ?? 0.0).toDouble();
         final installmentCount = data['installmentCount'] as int?;
+        final type = data['type'] as String? ?? 'loan';
+        final remainingAmount =
+            (data['remainingAmount'] ?? data['amount'] ?? 0.0).toDouble();
 
-        totalAmount += amount;
+        if (type == 'loan') {
+          totalAmount += remainingAmount;
+        }
 
-        // Add to transaction history
-        transactions.add({
-          'transactionId': doc.id,
-          'date': _formatDate(createdAt?.toDate()),
-          'amount': amount,
-          'status': _formatStatus(status),
-        });
+        // Add to transaction history (loan entries only)
+        if (type == 'loan') {
+          transactions.add({
+            'transactionId': doc.id,
+            'date': _formatDate(createdAt?.toDate()),
+            'amount': amount,
+            'status': _formatStatus(status),
+          });
+        }
+
+        final normalizedStatus = status.toLowerCase();
+        final bool isCleared = normalizedStatus == 'paid' ||
+            normalizedStatus == 'completed' ||
+            normalizedStatus == 'fully paid';
 
         // Add to due dates if applicable
-        if (dueDate != null && status.toLowerCase() != 'paid') {
+        if (dueDate != null && !isCleared && type == 'loan') {
           dueDates.add({
             'date': dueDate,
-            'amount': amount + (amount * interestRate / 100),
+            'amount': remainingAmount + (remainingAmount * interestRate / 100),
             'original': amount,
+            'remaining': remainingAmount,
             'status': _getDueStatus(dueDate),
             'repaymentType': repaymentType,
             'interest': interestRate,

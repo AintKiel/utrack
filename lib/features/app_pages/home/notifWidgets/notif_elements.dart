@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:utrack/features/app_pages/home/notifWidgets/notif_detail.dart';
 import '../../../../utils/constants/text_strings.dart';
 import '../../../../services/loan_request_service.dart';
@@ -10,6 +11,7 @@ class SampleNotifCards {
   static Widget overduePayment({
     required String borrowerName,
     required double amount,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.overduePaymentBody.replaceAll("{loanTitle}", "$borrowerName's loan");
@@ -28,7 +30,7 @@ class SampleNotifCards {
         style: const TextStyle(height: 1.4),
       ),
       subtitle: Text("₱${amount.toStringAsFixed(2)} • $borrowerName"),
-      time: "2 hours ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
@@ -36,6 +38,7 @@ class SampleNotifCards {
   static Widget paymentReminder({
     required String borrowerName,
     required double amount,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.paymentReminderBody.replaceAll("{loanTitle}", "$borrowerName's loan");
@@ -54,7 +57,7 @@ class SampleNotifCards {
         style: const TextStyle(height: 1.4),
       ),
       subtitle: Text("₱${amount.toStringAsFixed(2)} • $borrowerName"),
-      time: "1 day ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
@@ -62,6 +65,7 @@ class SampleNotifCards {
   static Widget paymentReceived({
     required String borrowerName,
     required double amount,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.paymentReceivedBody
@@ -82,7 +86,7 @@ class SampleNotifCards {
         style: const TextStyle(height: 1.4),
       ),
       subtitle: Text("₱${amount.toStringAsFixed(2)} • $borrowerName"),
-      time: "3 hours ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
@@ -90,6 +94,7 @@ class SampleNotifCards {
   static Widget paymentSent({
     required String lenderName,
     required double amount,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.paymentSentBody
@@ -110,7 +115,7 @@ class SampleNotifCards {
         style: const TextStyle(height: 1.4),
       ),
       subtitle: Text("₱${amount.toStringAsFixed(2)} • $lenderName"),
-      time: "1 day ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
@@ -118,6 +123,7 @@ class SampleNotifCards {
   static Widget upcomingPayment({
     required String borrowerName,
     required double amount,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.upcomingPaymentBody.replaceAll("{loanTitle}", "$borrowerName's loan");
@@ -136,7 +142,7 @@ class SampleNotifCards {
         style: const TextStyle(height: 1.4),
       ),
       subtitle: Text("₱${amount.toStringAsFixed(2)} • $borrowerName"),
-      time: "Tomorrow",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
@@ -145,6 +151,7 @@ class SampleNotifCards {
 
   static Widget creditScoreIncrease({
     required double percentage,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.creditScoreIncreaseBody.replaceAll("{percentage}", "$percentage");
@@ -155,13 +162,14 @@ class SampleNotifCards {
       title: UTexts.creditScoreIncreaseTitle,
       message: Text(body),
       subtitle: Text("+${percentage.toStringAsFixed(1)}% Credit Score"),
-      time: "3 days ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
 
   static Widget creditScoreDecrease({
     required double percentage,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.creditScoreDecreaseBody.replaceAll("{percentage}", "$percentage");
@@ -172,7 +180,7 @@ class SampleNotifCards {
       title: UTexts.creditScoreDecreaseTitle,
       message: Text(body),
       subtitle: Text("-${percentage.toStringAsFixed(1)}% Credit Score"),
-      time: "3 days ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
@@ -182,6 +190,7 @@ class SampleNotifCards {
   static Widget newBorrowRequest({
     required String borrowerName,
     required double amount,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
     required BuildContext context,
     String? requestId,
@@ -208,7 +217,7 @@ class SampleNotifCards {
         style: const TextStyle(height: 1.4),
       ),
       subtitle: Text("₱${amount.toStringAsFixed(2)} • $borrowerName"),
-      time: "2 days ago",
+      time: _formatTime(timestamp),
       buttonLabel: "View More",
       buttonColor: Colors.purple,
       onButtonPressed: () {
@@ -222,7 +231,7 @@ class SampleNotifCards {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxWidth: 360,
-                  maxHeight: 550, // 👈 limit dialog height
+                  maxHeight: 550, // 
                 ),
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -247,7 +256,7 @@ class SampleNotifCards {
                         repaymentType: repaymentType ?? "Single Repayment",
                         dueDate: dueDate ?? "N/A",
                         notes: notes ?? "No notes provided",
-                        requestedDate: "Today",
+                        requestedDate: DateFormat('MMM d, yyyy • h:mm a').format(timestamp ?? DateTime.now()),
                         requestId: requestId,
                         onApprove: requestId != null ? () async {
                           try {
@@ -330,9 +339,9 @@ class SampleNotifCards {
     );
   }
 
-
   static Widget requestApproved({
     required String lenderName,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.requestApprovedBody.replaceAll("{lenderName}", lenderName);
@@ -343,13 +352,14 @@ class SampleNotifCards {
       title: UTexts.requestApprovedTitle,
       message: Text(body),
       subtitle: Text("Approved by $lenderName"),
-      time: "Today",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
 
   static Widget requestRejected({
     required String lenderName,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.requestRejectedBody.replaceAll("{lenderName}", lenderName);
@@ -360,13 +370,14 @@ class SampleNotifCards {
       title: UTexts.requestRejectedTitle,
       message: Text(body),
       subtitle: Text("Declined by $lenderName"),
-      time: "Today",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
 
   static Widget loanFullyRepaid({
     required String borrowerName,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.loanFullyRepaidBody.replaceAll("{borrowerName}", borrowerName);
@@ -377,13 +388,14 @@ class SampleNotifCards {
       title: UTexts.loanFullyRepaidTitle,
       message: Text(body),
       subtitle: Text("Loan cleared by $borrowerName"),
-      time: "5 days ago",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
   }
 
   static Widget loanDueSoon({
     required String borrowerName,
+    required DateTime? timestamp,
     required VoidCallback onDelete,
   }) {
     String body = UTexts.loanDueSoonBody.replaceAll("{borrowerName}", borrowerName);
@@ -394,8 +406,23 @@ class SampleNotifCards {
       title: UTexts.loanDueSoonTitle,
       message: Text(body),
       subtitle: Text("Due Tomorrow • $borrowerName"),
-      time: "Today",
+      time: _formatTime(timestamp),
       onDelete: onDelete,
     );
+  }
+
+  static String _formatTime(DateTime? timestamp) {
+    if (timestamp == null) return 'Just now';
+
+    final now = DateTime.now();
+    final diff = now.difference(timestamp);
+
+    if (diff.inSeconds < 60) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays == 1) return 'Yesterday';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+
+    return DateFormat('MMM d, yyyy').format(timestamp);
   }
 }

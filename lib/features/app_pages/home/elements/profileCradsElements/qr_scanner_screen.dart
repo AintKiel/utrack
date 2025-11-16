@@ -4,11 +4,10 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../navigation_menu.dart';
+import '../../../../../services/paymongo_service.dart';
 import '../../../../../services/payment_tracking_service.dart';
 
 class QrScannerScreen extends StatefulWidget {
@@ -131,10 +130,15 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
 class PaymentScreen extends StatefulWidget {
   final String recipientId;
   final Map<String, dynamic> recipientData;
+  final bool isRepaymentMode;
+  final double? initialAmount;
 
   const PaymentScreen({
+    super.key,
     required this.recipientId,
     required this.recipientData,
+    this.isRepaymentMode = false,
+    this.initialAmount,
   });
 
   @override
@@ -149,6 +153,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void dispose() {
     amountController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialAmount != null) {
+      amountController.text = widget.initialAmount!.toStringAsFixed(2);
+    }
   }
 
   @override
@@ -244,14 +256,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _processPayment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: widget.isRepaymentMode ? Colors.green : Colors.blue,
                     disabledBackgroundColor: Colors.grey,
                   ),
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                    'Proceed to Payment',
-                    style: TextStyle(
+                      : Text(
+                    widget.isRepaymentMode ? 'Repay via PayMongo' : 'Proceed to Payment',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -292,10 +304,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => PaymentCheckoutScreen(
-              paymentLink: paymentLink,
+              paymentLink: paymentLink.checkoutUrl,
+              paymentLinkId: paymentLink.id,
               recipientId: widget.recipientId,
               recipientName: '${widget.recipientData['firstName']} ${widget.recipientData['lastName']}',
               amount: double.parse(amount),
+              isRepaymentMode: widget.isRepaymentMode,
             ),
           ),
         );
@@ -315,93 +329,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 }
 
-/// PayMongo Service
-class PayMongoService {
-  static const String ENVIRONMENT = 'test';
-
-  // YOUR TEST KEYS
-  static const String TEST_PUBLIC_KEY = 'pk_test_CQDsNDoGT4EnXvFAgrMGMLpM';
-  static const String TEST_SECRET_KEY = 'sk_test_iPMMyqzCWCjikF6fcXRzNzBg';
-
-  // YOUR LIVE KEYS
-  static const String LIVE_PUBLIC_KEY = 'pk_live_hsUmDDm8SswvkPzMQ2yR5GPV';
-  static const String LIVE_SECRET_KEY = 'sk_live_zLce87z5w74gy1mHnJdPhXKA';
-
-  static String get PAYMONGO_PUBLIC_KEY {
-    return ENVIRONMENT == 'live' ? LIVE_PUBLIC_KEY : TEST_PUBLIC_KEY;
-  }
-
-  static String get PAYMONGO_SECRET_KEY {
-    return ENVIRONMENT == 'live' ? LIVE_SECRET_KEY : TEST_SECRET_KEY;
-  }
-
-  static const String PAYMONGO_API_URL = 'https://api.paymongo.com/v1';
-
-  static Future<String?> createPaymentLink({
-    required double amount,
-    required String recipientId,
-    required String recipientName,
-  }) async {
-    try {
-      final amountInCentavos = (amount * 100).toInt();
-
-      // Use SECRET key for creating payment links
-      final response = await http.post(
-        Uri.parse('$PAYMONGO_API_URL/links'),
-        headers: {
-          'Authorization': 'Basic ${_getBasicAuth(PAYMONGO_SECRET_KEY)}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'data': {
-            'attributes': {
-              'amount': amountInCentavos,
-              'currency': 'PHP',
-              'description': 'Payment to $recipientName',
-              'remarks': 'UTrack Payment Link',
-            }
-          }
-        }),
-      );
-
-      print('🔗 Create Payment Link Response: ${response.statusCode}');
-      print('🔗 Body: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final jsonResponse = jsonDecode(response.body);
-        final paymentLink = jsonResponse['data']['attributes']['checkout_url'];
-
-        print('✅ Payment link created: $paymentLink');
-        return paymentLink;
-      } else {
-        print('❌ PayMongo Error: ${response.body}');
-        throw Exception('Failed to create payment link: ${response.body}');
-      }
-    } catch (e) {
-      print('❌ Error creating payment link: $e');
-      rethrow;
-    }
-  }
-
-  static String _getBasicAuth(String key) {
-    final credentials = '$key:';
-    return base64Encode(utf8.encode(credentials));
-  }
-}
-
 /// Payment Checkout Screen
 /// Payment Checkout Screen
 class PaymentCheckoutScreen extends StatefulWidget {
   final String paymentLink;
+  final String paymentLinkId;
   final String recipientId;
   final String recipientName;
   final double amount;
+  final bool isRepaymentMode;
 
   const PaymentCheckoutScreen({
+    super.key,
     required this.paymentLink,
+    required this.paymentLinkId,
     required this.recipientId,
     required this.recipientName,
     required this.amount,
+    this.isRepaymentMode = false,
   });
 
   @override
@@ -410,6 +355,7 @@ class PaymentCheckoutScreen extends StatefulWidget {
 
 class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
   bool _paymentCompleted = false;
+  bool _verifying = false;
 
   @override
   Widget build(BuildContext context) {
@@ -486,7 +432,11 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
                   disabledBackgroundColor: Colors.grey,
                 ),
                 child: Text(
-                  _paymentCompleted ? 'Payment Recorded ✓' : 'Go to Payment',
+                  _paymentCompleted
+                      ? 'Payment Recorded ✓'
+                      : _verifying
+                          ? 'Verifying...'
+                          : 'Go to Payment',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -542,7 +492,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
               TextButton(
                 onPressed: () async {
                   Navigator.pop(context);
-                  await _recordPayment();
+                  await _confirmViaPayMongo();
                 },
                 child: const Text('Yes, Confirm Payment'),
               ),
@@ -551,9 +501,40 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
     );
   }
 
-  // In your PaymentTrackingService, make sure recordPayment() updates the stats:
+  Future<void> _confirmViaPayMongo() async {
+    setState(() => _verifying = true);
+    try {
+      final isPaid = await PayMongoService.verifyPaymentStatus(widget.paymentLinkId);
+      if (!isPaid) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('PayMongo has not marked this link as paid yet.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
 
-  Future<void> _recordPayment() async {
+      await _recordTransaction();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Verification failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _verifying = false);
+      }
+    }
+  }
+
+  Future<void> _recordTransaction() async {
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
 
@@ -565,13 +546,24 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
       }
 
       // Call the PaymentTrackingService method
-      bool success = await PaymentTrackingService.recordPayment(
-        senderId: currentUser.uid,
-        recipientId: widget.recipientId,
-        recipientName: widget.recipientName,
-        amount: widget.amount,
-        paymentMethod: 'paymongo',
-      );
+      bool success;
+      if (widget.isRepaymentMode) {
+        success = await PaymentTrackingService.recordRepayment(
+          senderId: currentUser.uid,
+          recipientId: widget.recipientId,
+          recipientName: widget.recipientName,
+          amount: widget.amount,
+          paymentMethod: 'paymongo',
+        );
+      } else {
+        success = await PaymentTrackingService.recordPayment(
+          senderId: currentUser.uid,
+          recipientId: widget.recipientId,
+          recipientName: widget.recipientName,
+          amount: widget.amount,
+          paymentMethod: 'paymongo',
+        );
+      }
 
       if (success) {
         // Update contact counts
@@ -582,7 +574,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Payment recorded successfully!'),
+              content: Text(widget.isRepaymentMode ? 'Repayment recorded successfully!' : 'Payment recorded successfully!'),
               backgroundColor: Colors.green,
             ),
           );

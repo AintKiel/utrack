@@ -64,17 +64,20 @@ class LendingService {
         final amount = (data['amount'] ?? 0.0).toDouble();
         final createdAt = data['createdAt'] as Timestamp?;
         final status = data['status'] as String? ?? 'Unpaid';
+        final type = (data['type'] as String?) ?? 'loan';
+        final signedAmount = type == 'repayment' ? -amount : amount;
 
         if (recipientId != null) {
           if (debtorMap.containsKey(recipientId)) {
             // Add to existing debtor's total
-            debtorMap[recipientId]!['amount'] += amount;
+            debtorMap[recipientId]!['rawAmount'] =
+                (debtorMap[recipientId]!['rawAmount'] as double) + signedAmount;
           } else {
             // Create new debtor entry
             debtorMap[recipientId] = {
               'recipientId': recipientId,
               'name': recipientName,
-              'amount': amount,
+              'rawAmount': signedAmount,
               'date': createdAt?.toDate() ?? DateTime.now(),
               'status': status,
               'initials': _getInitials(recipientName),
@@ -85,10 +88,14 @@ class LendingService {
 
       // Convert to list and format
       return debtorMap.values.map((debtor) {
+        final balance = (debtor['rawAmount'] as double);
+        final displayAmount = balance <= 0 ? 0.0 : balance;
         return {
           'recipientId': debtor['recipientId'],
           'name': debtor['name'],
-          'amount': debtor['amount'].toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), ''),
+          'amount': displayAmount
+              .toStringAsFixed(2)
+              .replaceAll(RegExp(r'\.00$'), ''),
           'date': _formatDate(debtor['date']),
           'status': debtor['status'],
           'color': _getStatusColor(debtor['status']),

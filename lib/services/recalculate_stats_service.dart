@@ -15,14 +15,13 @@ class RecalculateStatsService {
 
       print('🔄 Starting recalculation for user: ${currentUser.uid}');
 
-      // 1. Get all LentTransactions
-      final lentSnapshot = await _firestore
-          .collection('Users')
-          .doc(currentUser.uid)
-          .collection('LentTransactions')
+      // 1. Get global loan transactions created by the current user (lender)
+      final globalTransactionsSnapshot = await _firestore
+          .collection('Transactions')
+          .where('senderId', isEqualTo: currentUser.uid)
           .get();
 
-      // 2. Get all OwedTransactions
+      // 2. Get all OwedTransactions (as borrower)
       final owedSnapshot = await _firestore
           .collection('Users')
           .doc(currentUser.uid)
@@ -33,17 +32,23 @@ class RecalculateStatsService {
       double totalLent = 0.0;
       Set<String> uniqueBorrowers = {};
 
-      for (var doc in lentSnapshot.docs) {
+      for (var doc in globalTransactionsSnapshot.docs) {
         final data = doc.data();
+        final entryType = (data['type'] ?? 'loan').toString().toLowerCase();
+        if (entryType != 'loan') continue;
+
         final amount = (data['amount'] ?? 0.0).toDouble();
+        final remaining = (data['remainingAmount'] ?? amount).toDouble();
         final recipientId = data['recipientId'] as String?;
-        
-        totalLent += amount;
+        final status = (data['status'] ?? 'active').toString().toLowerCase();
+        final isCleared = status == 'paid' || status == 'completed' || status == 'fully paid';
+
+        totalLent += isCleared ? 0 : remaining;
         if (recipientId != null && recipientId.isNotEmpty) {
           uniqueBorrowers.add(recipientId);
         }
 
-        print('  📤 Lent: ₱$amount to ${data['recipientName']}');
+        print('  📤 Lent: ₱$amount (remaining ₱${(isCleared ? 0 : remaining).toStringAsFixed(2)}) to ${data['recipientName']}');
       }
 
       double totalOwed = 0.0;
@@ -51,15 +56,21 @@ class RecalculateStatsService {
 
       for (var doc in owedSnapshot.docs) {
         final data = doc.data();
+        final entryType = (data['type'] ?? 'loan').toString().toLowerCase();
+        if (entryType != 'loan') continue;
+
         final amount = (data['amount'] ?? 0.0).toDouble();
+        final remaining = (data['remainingAmount'] ?? amount).toDouble();
         final senderId = data['senderId'] as String?;
-        
-        totalOwed += amount;
+        final status = (data['status'] ?? 'active').toString().toLowerCase();
+        final isCleared = status == 'paid' || status == 'completed' || status == 'fully paid';
+
+        totalOwed += isCleared ? 0 : remaining;
         if (senderId != null && senderId.isNotEmpty) {
           uniqueLenders.add(senderId);
         }
 
-        print('  📥 Owed: ₱$amount to ${data['senderName']}');
+        print('  📥 Owed: ₱$amount (remaining ₱${(isCleared ? 0 : remaining).toStringAsFixed(2)}) from ${data['senderName']}');
       }
 
       print('\n📊 Calculated Stats:');

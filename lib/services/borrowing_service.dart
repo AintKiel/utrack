@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'notification_service.dart';
+
 class BorrowingService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -64,17 +66,20 @@ class BorrowingService {
         final amount = (data['amount'] ?? 0.0).toDouble();
         final createdAt = data['createdAt'] as Timestamp?;
         final status = data['status'] as String? ?? 'Unpaid';
+        final type = (data['type'] as String?) ?? 'loan';
+        final signedAmount = type == 'repayment' ? -amount : amount;
 
         if (senderId != null) {
           if (lenderMap.containsKey(senderId)) {
             // Add to existing lender's total
-            lenderMap[senderId]!['amount'] += amount;
+            lenderMap[senderId]!['rawAmount'] =
+                (lenderMap[senderId]!['rawAmount'] as double) + signedAmount;
           } else {
             // Create new lender entry
             lenderMap[senderId] = {
               'senderId': senderId,
               'name': senderName,
-              'amount': amount,
+              'rawAmount': signedAmount,
               'date': createdAt?.toDate() ?? DateTime.now(),
               'status': status,
               'initials': _getInitials(senderName),
@@ -85,10 +90,14 @@ class BorrowingService {
 
       // Convert to list and format
       return lenderMap.values.map((lender) {
+        final balance = (lender['rawAmount'] as double);
+        final displayAmount = balance <= 0 ? 0.0 : balance;
         return {
           'senderId': lender['senderId'],
           'name': lender['name'],
-          'amount': lender['amount'].toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), ''),
+          'amount': displayAmount
+              .toStringAsFixed(2)
+              .replaceAll(RegExp(r'\.00$'), ''),
           'date': _formatDate(lender['date']),
           'status': lender['status'],
           'color': _getStatusColor(lender['status']),
@@ -138,6 +147,50 @@ class BorrowingService {
       case 'pending':
       default:
         return const Color(0xFF9E9E9E); // Grey
+    }
+  }
+
+  /// Send a cash repayment notification to the lender so they can confirm it later.
+  static Future<bool> notifyCashRepaymentRequest({
+    required String lenderId,
+    required double amount,
+  }) async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return false;
+
+      final borrowerDoc = await _firestore.collection('Users').doc(currentUser.uid).get();
+      final borrowerName = borrowerDoc.data()?['firstName'] ?? borrowerDoc.data()?['email'] ?? 'Borrower';
+
+      await NotificationService.createNotification(
+        userId: lenderId,
+        type: 'cashRepayment',
+        title: 'Cash Repayment Pending',
+        message: '$borrowerName wants to repay ₱${amount.toStringAsFixed(2)} in cash.',
+        data: {
+          'amount': amount,
+          'borrowerName': borrowerName,
+          'borrowerId': currentUser.uid,
+          'paymentMethod': 'cash',
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print('❌ Error notifying cash repayment: $e');
+      return false;
+    }
+  }
+
+  /// Helper to fetch a user's profile map (used for direct e-wallet payments)
+  static Future<Map<String, dynamic>?> getUserProfile(String userId) async {
+    try {
+      final doc = await _firestore.collection('Users').doc(userId).get();
+      if (!doc.exists) return null;
+      return doc.data();
+    } catch (e) {
+      print('❌ Error fetching user profile: $e');
+      return null;
     }
   }
 }

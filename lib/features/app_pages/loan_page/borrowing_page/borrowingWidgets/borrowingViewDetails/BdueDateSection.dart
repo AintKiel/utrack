@@ -5,8 +5,15 @@ import 'BpaymentDialogs.dart';
 
 class DueDatesSection extends StatelessWidget {
   final List<Map<String, dynamic>> dueDates;
+  final String lenderId;
+  final String lenderName;
 
-  const DueDatesSection({super.key, required this.dueDates});
+  const DueDatesSection({
+    super.key,
+    required this.dueDates,
+    required this.lenderId,
+    required this.lenderName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +30,13 @@ class DueDatesSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // ✅ No pending dues
+        // No pending dues
         if (pendingDues.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: Center(
               child: Text(
-                '🎉 All dues are cleared — no pending payments!',
+                ' All dues are cleared — no pending payments!',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontStyle: FontStyle.italic,
@@ -153,8 +160,12 @@ class DueDatesSection extends StatelessWidget {
 
                       // Pay button (aligned under badge)
                       ElevatedButton(
-                        onPressed: () =>
-                            showPaymentMethodDialog(context, due),
+                        onPressed: () => showPaymentMethodDialog(
+                          context,
+                          due,
+                          lenderId: lenderId,
+                          lenderName: lenderName,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(

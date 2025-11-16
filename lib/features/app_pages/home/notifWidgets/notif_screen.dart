@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
 import 'package:utrack/services/notification_service.dart';
@@ -73,6 +74,8 @@ class _UNotificationScreenState extends State<UNotificationScreen> {
                       itemBuilder: (context, index) {
                         final n = notifications[index];
                         final data = n['data'] as Map<String, dynamic>? ?? {};
+                        final DateTime? timestamp =
+                            (n['timestamp'] is Timestamp) ? (n['timestamp'] as Timestamp).toDate() : null;
                         
                         switch (n["type"]) {
                         // -------- PAYMENT RELATED --------
@@ -80,30 +83,35 @@ class _UNotificationScreenState extends State<UNotificationScreen> {
                             return SampleNotifCards.overduePayment(
                               borrowerName: data["lenderName"] ?? "Unknown",
                               amount: (data["amount"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "paymentReminder":
                             return SampleNotifCards.paymentReminder(
                               borrowerName: data["borrowerName"] ?? "Unknown",
                               amount: (data["amount"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "paymentReceived":
                             return SampleNotifCards.paymentReceived(
                               borrowerName: data["borrowerName"] ?? "Unknown",
                               amount: (data["amount"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "paymentSent":
                             return SampleNotifCards.paymentSent(
                               lenderName: data["lenderName"] ?? "Unknown",
                               amount: (data["amount"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "upcomingPayment":
                             return SampleNotifCards.upcomingPayment(
                               borrowerName: data["lenderName"] ?? "Unknown",
                               amount: (data["amount"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
 
@@ -111,11 +119,13 @@ class _UNotificationScreenState extends State<UNotificationScreen> {
                           case "creditIncrease":
                             return SampleNotifCards.creditScoreIncrease(
                               percentage: (data["difference"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "creditDecrease":
                             return SampleNotifCards.creditScoreDecrease(
                               percentage: (data["difference"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
 
@@ -124,6 +134,7 @@ class _UNotificationScreenState extends State<UNotificationScreen> {
                             return SampleNotifCards.newBorrowRequest(
                               borrowerName: data["borrowerName"] ?? "Unknown",
                               amount: (data["amount"] as num?)?.toDouble() ?? 0.0,
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                               context: context,
                               requestId: data["requestId"],
@@ -135,21 +146,25 @@ class _UNotificationScreenState extends State<UNotificationScreen> {
                           case "requestApproved":
                             return SampleNotifCards.requestApproved(
                               lenderName: data["lenderName"] ?? "Unknown",
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "requestRejected":
                             return SampleNotifCards.requestRejected(
                               lenderName: data["lenderName"] ?? "Unknown",
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "loanFullyRepaid":
                             return SampleNotifCards.loanFullyRepaid(
                               borrowerName: data["borrowerName"] ?? "Unknown",
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
                           case "loanDueSoon":
                             return SampleNotifCards.loanDueSoon(
                               borrowerName: data["borrowerName"] ?? "Unknown",
+                              timestamp: timestamp,
                               onDelete: () => _removeNotification(n['id']),
                             );
 

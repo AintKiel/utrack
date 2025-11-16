@@ -168,7 +168,11 @@ class _BorrowingMoreInfosState extends State<BorrowingMoreInfos> {
                         const SizedBox(height: 25),
 
                         // Due Dates
-                        DueDatesSection(dueDates: dueDates),
+                        DueDatesSection(
+                          dueDates: dueDates,
+                          lenderId: senderUid,
+                          lenderName: lenderName,
+                        ),
                         const SizedBox(height: 20),
 
                         // Transaction History
@@ -180,7 +184,11 @@ class _BorrowingMoreInfosState extends State<BorrowingMoreInfos> {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              showConfirmPaymentDialog(context);
+                              showConfirmPaymentDialog(
+                                context,
+                                lenderId: senderUid,
+                                lenderName: lenderName,
+                              );
                             },
                             icon: const Icon(Icons.check_circle_outline),
                             label: const Text('Pay debt'),
