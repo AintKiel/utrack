@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:utrack/features/app_pages/loan_page/lending_page/lendingWidgets/rateBorrower.dart';
 import 'package:utrack/utils/constants/text_strings.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/formatters/iconsNoPad.dart';
@@ -172,7 +173,7 @@ class DebtorList extends StatelessWidget {
                 flex: 3,
                 child: OutlinedButton(
                   onPressed: () {
-                    // your rate action
+                    RateBorrowerDialog.show(context);
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 8),
