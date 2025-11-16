@@ -165,44 +165,79 @@ class DebtorList extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // 🔹 View Details Button (opens popup)
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    opaque: false,
-                    barrierDismissible: true,
-                    pageBuilder: (_, __, ___) => LendingMoreInfos(
-                      debtor: debtor, // ✅ now works properly
+          Row(
+            children: [
+              // 🔹 RATE BUTTON (30%)
+              Expanded(
+                flex: 3,
+                child: OutlinedButton(
+                  onPressed: () {
+                    // your rate action
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    side: BorderSide(
+                      color: dark ? Colors.white54 : Colors.black45,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                );
-              },
-              icon: Icon(
-                Icons.remove_red_eye_rounded,
-                size: 16,
-                color: dark ? Colors.white : Colors.black,
-              ),
-              label: Text(
-                'View Details',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: dark ? Colors.white : Colors.black,
+                  child: Text(
+                    "Rate",
+                    style: TextStyle(
+                      color: dark ? Colors.white : Colors.black,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                    color: dark ? Colors.white54 : Colors.black45),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+
+              const SizedBox(width: 10),
+
+              // 🔹 VIEW DETAILS BUTTON (70%)
+              Expanded(
+                flex: 7,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        opaque: false,
+                        barrierDismissible: true,
+                        pageBuilder: (_, __, ___) => LendingMoreInfos(
+                          debtor: debtor,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.remove_red_eye_rounded,
+                    size: 16,
+                    color: dark ? Colors.white : Colors.black,
+                  ),
+                  label: Text(
+                    'View Details',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: dark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: dark ? Colors.white54 : Colors.black45,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
+            ],
+          )
         ],
       ),
     );
