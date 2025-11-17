@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../common/widgets/custom_shapes/containers/tertiary_header_container.dart';
 import 'searchBar.dart';
 import 'transacContainer.dart';
 
@@ -136,54 +137,72 @@ class _HistoryMainState extends State<HistoryMain> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black,
-        titleSpacing: 35,   // adds left padding
-        title: const Text(
-          'History',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor:
+      isDark ? Colors.grey.shade900 : Colors.grey.shade100,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              HistorySearchBar(
-                onFilterChanged: _onFilterChanged,
-                onSearchChanged: _onSearchChanged,
+        top: false,
+        child: Column(
+          children: [
+            UTertiaryHeaderContainer(
+              height: 290,   // Increased height prevents overflow
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 65),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "History",
+                      style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 25,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    HistorySearchBar(
+                      onFilterChanged: _onFilterChanged,
+                      onSearchChanged: _onSearchChanged,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: _filtered.isEmpty
-                    ? const Center(child: Text('No transactions found'))
-                    : ListView.builder(
-                  itemCount: _filtered.length,
-                  itemBuilder: (context, index) {
-                    final t = _filtered[index];
-                    // split date/time display
-                    final date = DateFormat('MM/dd/yyyy').format(t.dateTime);
-                    final time = DateFormat('hh:mm a').format(t.dateTime);
-                    return TransacContainer(
+            ),
+            /// -----------------------------------------
+            /// TRANSACTION LIST
+            /// -----------------------------------------
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: _filtered.length,
+                itemBuilder: (context, index) {
+                  final t = _filtered[index];
+
+                  final date = DateFormat('MM/dd/yyyy').format(t.dateTime);
+                  final time = DateFormat('hh:mm a').format(t.dateTime);
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,  // 🔥 Smaller than 16
+                      vertical: 6,
+                    ),
+                    child: TransacContainer(
                       name: t.name,
                       type: t.type,
                       status: t.status,
                       amount: t.amount,
                       date: date,
                       time: time,
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

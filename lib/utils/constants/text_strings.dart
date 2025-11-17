@@ -5,7 +5,7 @@ class UTexts {
   static const String signupTitle= "Let's  create your account";
   static const String forgetPasswordTitle= "Forget Password";
   static const String changeYourPasswordTitle = "Password Reset Email Sent";
-  static const String confirmEmail= "Verify your email address!";
+  static const String confirmEmail= "Verify your email contacts!";
   static const String confirmEmailSentCode = "We sent a code to";
   static const String emailNotReceiveCode = "Didn't get the code? ";
   static const String verifyID = "Verify your identity! ";
@@ -15,6 +15,7 @@ class UTexts {
   static const String enterNewPass = "Enter a new password!";
   static const String accountCreated ="Account Created Successfully!";
   static const String passwordUpdated ="Password Updated Successfully!";
+  static const String changePasswordTitle= "Change Password";
 
   //subtitles
   static const String createdSuccessfullySub ="All set! You can now login to your account";
@@ -22,7 +23,8 @@ class UTexts {
   static const String yourAccountCreatedSubTitle = "Welcome to Your Trusted Lending Companion: Your Account is Created, Discover Hassle-Free Debt Tracking.";
   static const String verifyIDsubtitle = "Congratulations, your email has now been verified. Please submit your valid ID to complete verification process.";
   static const String changeYourPasswordSubTitle= "Your Account Security is Our Priority! We've Sent You a Secure Link to Safely Change Your Password and Keep Your Account Protected.";
-  static const String forgetPasswordSubtitle = "Don't worry sometimes people can forget too, enter your email and we will send you a password reset link.";
+  static const String forgetPasswordSubtitle = "Don't worry sometimes people can forget too, enter your email to verify your identity.";
+  static const String changePasswordSubtitle = "Change your password anytime to help protect your account, enter your email to verify your identity.";
 
   // -- SignUp Form texts
   static const String firstName = "First Name";
@@ -161,7 +163,7 @@ class UTexts {
   static const String creditScoreEx = ": 85%";
   static const String userID = "User ID: ";
   static const String userIDex = "user123";
-  static const String qrUse = "📌 You can show this QR code to your lender or borrower to share your credit profile quickly and securely.";
+  static const String qrUse = "📌 You can show this QR code to your lender or borrower to share your credit activityTransaction quickly and securely.";
   static const String download = "Download";
   static const String share = "Share";
 

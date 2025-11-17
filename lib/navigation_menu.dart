@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:utrack/features/app_pages/home/home_page.dart';
 import 'package:utrack/features/app_pages/loan_page/lending_page/lending_page.dart';
+import 'package:utrack/features/app_pages/profile_page/personalization/screens/accountScreen.dart';
 import 'package:utrack/utils/constants/colors.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/helpers/helper_functions.dart';
@@ -46,6 +47,6 @@ class NavigationController extends GetxController {
     const HomePageScreen(),
     const LoanMainPage(), // This will manage Lending & Borrowing
     const HistoryMain(),
-    Container(color: Colors.red),
+    AccountScreen(),
   ];
 }

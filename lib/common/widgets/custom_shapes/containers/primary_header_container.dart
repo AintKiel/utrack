@@ -19,20 +19,24 @@ class UPrimaryHeaderContainer extends StatelessWidget {
         child: SizedBox(
           height: 400,
           width: double.infinity,
-          child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(top: -150, right: -250,
-                    child: UCircularContainer(backgroundColor: UColors.primary.withOpacity(0.1))),
-                Positioned(top: 100, right: -300,
-                    child: UCircularContainer(backgroundColor: UColors.textWhite)),
-                Positioned.fill(
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: child,
+          child: Container(
+            color: UColors.primary,
+
+            child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(top: -150, right: -250,
+                      child: UCircularContainer(backgroundColor: UColors.primary.withOpacity(0.1))),
+                  Positioned(top: 100, right: -300,
+                      child: UCircularContainer(backgroundColor: UColors.textWhite)),
+                  Positioned.fill(
+                    child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: child,
+                    ),
                   ),
-                ),
-              ]
+                ]
+            ),
           ),
         ),
       ),

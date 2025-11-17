@@ -52,7 +52,7 @@ class _HistorySearchBarState extends State<HistorySearchBar> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E).withOpacity(0.6) : Colors.white.withOpacity(0.6),
         borderRadius: BorderRadius.circular(10),
       ),
       child: DropdownButton<String>(
@@ -76,7 +76,7 @@ class _HistorySearchBarState extends State<HistorySearchBar> {
             hintText: "Search transactions...",
             prefixIcon: const Icon(Icons.search),
             filled: true,
-            fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            fillColor: isDark ? const Color(0xFF1E1E1E).withOpacity(0.6) : Colors.white.withOpacity(0.6),
             contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
