@@ -11,6 +11,7 @@ class ULogos {
   static const String sendEmail = "assets/images/send_email.png";
   static const String verifyID = "assets/images/id_verify.png";
   static const String notifLogo = "assets/images/notification.png";
+  static const String helpCenter = "assets/images/help_center.png";
 
 }
 

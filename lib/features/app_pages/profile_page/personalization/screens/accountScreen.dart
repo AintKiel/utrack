@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:utrack/features/app_pages/home/notifWidgets/notif_screen.dart';
 import 'package:utrack/features/app_pages/profile_page/personalization/screens/settings/changePass.dart';
+import 'package:utrack/features/app_pages/profile_page/personalization/screens/settings/faqs.dart';
 import 'package:utrack/features/app_pages/profile_page/personalization/screens/settings/settingSection.dart';
+import 'package:utrack/features/app_pages/profile_page/personalization/screens/settings/termsConditions.dart';
 import 'package:utrack/features/authentication/screens/login/login.dart';
 import '../../../../../common/widgets/custom_shapes/containers/tertiary_header_container.dart';
 import '../../../../../utils/constants/colors.dart';
@@ -83,8 +85,8 @@ class AccountScreen extends StatelessWidget {
             SettingsListCard(
               onNotifications: () => Get.to(() => const UNotificationScreen()),
               onPrivacy: () => Get.to(() => const ChangePassEmail()),
-              onHelp: () {},
-              onTerms: () {},
+              onHelp: () => Get.to(() => const HelpCenterScreen()),
+              onTerms: () => Get.to(() => const TermsConditions()),
             ),
 
             const SizedBox(height: 30),
