@@ -19,6 +19,8 @@ class UTexts {
   static const String emailNotReceiveCode = "Didn't get the code? ";
   static const String yourAccountCreatedSubTitle = "Welcome to Your Ultimate Shopping Destination: Your Account is Created, Unleash the Joy of Seamless Online Shopping!";
   static const String accountCreated = "Your account successfully created!";
+  static const String changePasswordTitle= "Change Password";
+  static const String changePasswordSubtitle = "Change your password anytime to help protect your account, enter your email to verify your identity.";
 
   // -- AUTHENTICATION FORM TEXT
   static const String firstName = "First Name";

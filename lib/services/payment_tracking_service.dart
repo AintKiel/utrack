@@ -222,6 +222,13 @@ class PaymentTrackingService {
       final senderDoc = await _firestore.collection('Users').doc(senderId).get();
       final senderName = senderDoc.data()?['firstName'] ?? 'Unknown';
 
+      // Calculate remaining amount after this payment
+      final remainingResult = await _calculateRemainingAmount(
+        borrowerId: senderId,
+        lenderId: recipientId,
+        paymentAmount: amount,
+      );
+
       // 1. Add to sender's OWED history (they're paying back what they owe)
       await _firestore
           .collection('Users')
@@ -236,10 +243,12 @@ class PaymentTrackingService {
         'paymentMethod': paymentMethod,
         'status': 'completed',
         'type': 'repayment',
+        'remainingAmount': remainingResult['remaining'], // Add remaining amount for badge
         'createdAt': FieldValue.serverTimestamp(),
       });
 
       // 2. Add to recipient's LENT history (they're being paid back)
+      // NOTE: paymentConfirmed is FALSE - lender must confirm before it shows in their history
       await _firestore
           .collection('Users')
           .doc(recipientId)
@@ -250,8 +259,10 @@ class PaymentTrackingService {
         'senderName': recipientName,
         'amount': amount,
         'paymentMethod': paymentMethod,
-        'status': 'completed',
+        'status': 'pending_confirmation', // Waiting for lender to confirm
+        'paymentConfirmed': false, // Must be confirmed by lender
         'type': 'repayment',
+        'remainingAmount': remainingResult['remaining'], // Add remaining amount for badge
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -298,12 +309,66 @@ class PaymentTrackingService {
     }
   }
 
+  /// Calculate remaining amount after a payment
+  static Future<Map<String, dynamic>> _calculateRemainingAmount({
+    required String borrowerId,
+    required String lenderId,
+    required double paymentAmount,
+  }) async {
+    try {
+      // Get all outstanding loans from this lender to this borrower
+      final owedSnapshot = await _firestore
+          .collection('Users')
+          .doc(borrowerId)
+          .collection('OwedTransactions')
+          .where('senderId', isEqualTo: lenderId)
+          .get();
+
+      // Calculate total outstanding amount
+      double totalOutstanding = 0.0;
+      for (final doc in owedSnapshot.docs) {
+        final data = doc.data();
+        final entryType = (data['type'] ?? 'loan').toString();
+        if (entryType != 'loan') continue; // Only count original loans
+
+        final double currentRemaining =
+            (data['remainingAmount'] ?? data['amount'] ?? 0.0).toDouble();
+        totalOutstanding += currentRemaining;
+      }
+
+      // Calculate remaining after this payment
+      final remaining = totalOutstanding - paymentAmount;
+      final sanitizedRemaining = remaining <= 0.01 ? 0.0 : remaining;
+
+      return {
+        'totalOutstanding': totalOutstanding,
+        'remaining': sanitizedRemaining,
+        'isFullPayment': sanitizedRemaining <= 0.01,
+      };
+    } catch (e) {
+      print('❌ Error calculating remaining amount: $e');
+      return {
+        'totalOutstanding': 0.0,
+        'remaining': 0.0,
+        'isFullPayment': false,
+      };
+    }
+  }
+
   static Future<void> _applyRepaymentToOutstandingLoans({
     required String borrowerId,
     required String lenderId,
     required double amount,
     required String paymentMethod,
   }) async {
+    print('');
+    print('💸 ============ APPLYING REPAYMENT ============');
+    print('   Borrower: $borrowerId');
+    print('   Lender: $lenderId');
+    print('   Amount: ₱$amount');
+    print('   Payment Method: $paymentMethod');
+    print('================================================');
+
     double remainingToApply = amount;
 
     final owedSnapshot = await _firestore
@@ -312,6 +377,8 @@ class PaymentTrackingService {
         .collection('OwedTransactions')
         .where('senderId', isEqualTo: lenderId)
         .get();
+
+    print('📋 Found ${owedSnapshot.docs.length} owed transactions to process');
 
     final docs = List.from(owedSnapshot.docs)
       ..sort((a, b) {
@@ -334,12 +401,16 @@ class PaymentTrackingService {
     bool canUpdateLenderLoans = false;
 
     try {
+      print('🔍 Attempting to fetch lender loans for lenderId: $lenderId, borrowerId: $borrowerId');
+
       final lenderLoansSnapshot = await _firestore
           .collection('Users')
           .doc(lenderId)
           .collection('LentTransactions')
           .where('recipientId', isEqualTo: borrowerId)
           .get();
+
+      print('📋 Found ${lenderLoansSnapshot.docs.length} lender loan documents');
 
       lenderLoanDocs = List<QueryDocumentSnapshot<Map<String, dynamic>>>.from(
         lenderLoansSnapshot.docs,
@@ -357,11 +428,16 @@ class PaymentTrackingService {
 
       for (final doc in lenderLoanDocs) {
         final txId = doc.data()['transactionId'];
+        final amount = doc.data()['amount'];
+        final remaining = doc.data()['remainingAmount'];
+        final type = doc.data()['type'];
+        print('   📄 Lender loan doc: txId=$txId, amount=$amount, remaining=$remaining, type=$type');
         if (txId is String && txId.isNotEmpty) {
           lenderDocsByTransactionId[txId] = doc;
         }
       }
 
+      print('✅ Successfully loaded ${lenderDocsByTransactionId.length} lender loans indexed by transactionId');
       canUpdateLenderLoans = true;
     } catch (e) {
       print(
@@ -429,6 +505,8 @@ class PaymentTrackingService {
       });
 
       final transactionId = data['transactionId'] as String?;
+      print('💰 Processing owed loan: txId=$transactionId, applied=$applied, remaining=$sanitizedRemaining, fullyPaid=$fullyPaid');
+
       if (transactionId != null) {
         final transactionRef =
             _firestore.collection('Transactions').doc(transactionId);
@@ -438,12 +516,15 @@ class PaymentTrackingService {
             'status': fullyPaid ? 'completed' : 'partial',
             'updatedAt': FieldValue.serverTimestamp(),
           });
+          print('   ✅ Updated global Transaction doc');
         } catch (e) {
-          print('⚠️ Unable to update transaction $transactionId: $e');
+          print('   ⚠️ Unable to update transaction $transactionId: $e');
         }
 
+        print('   🔍 Looking for matching lender loan with txId=$transactionId');
         final lenderDoc = findLenderLoan(transactionId);
         if (lenderDoc != null) {
+          print('   ✅ Found lender loan! Updating...');
           consumedLenderDocIds.add(lenderDoc.id);
           await lenderDoc.reference.update({
             'remainingAmount': sanitizedRemaining,
@@ -451,16 +532,80 @@ class PaymentTrackingService {
             'lastPaymentAt': FieldValue.serverTimestamp(),
             'lastPaymentMethod': paymentMethod,
           });
+          print('   ✅ Lender loan updated successfully!');
         } else if (canUpdateLenderLoans) {
           print(
-            '⚠️ Unable to locate lender loan entry for transaction $transactionId while applying repayment.',
+            '   ⚠️ Unable to locate lender loan entry for transaction $transactionId while applying repayment.',
           );
+          print('   Available lender transactionIds: ${lenderDocsByTransactionId.keys.toList()}');
+        } else {
+          print('   ⚠️ Cannot update lender loans (canUpdateLenderLoans=false)');
         }
+      } else {
+        print('   ⚠️ No transactionId found in owed transaction');
       }
     }
 
     if (remainingToApply > 0) {
       print('⚠️ Repayment still has ₱$remainingToApply unapplied.');
     }
+  }
+
+  /// Confirm a payment (called by the lender)
+  /// This marks the payment as confirmed so it appears in lender's history
+  static Future<bool> confirmPayment({
+    required String lenderId,
+    required String paymentDocId, // Document ID of the repayment in LentTransactions
+  }) async {
+    try {
+      await _firestore
+          .collection('Users')
+          .doc(lenderId)
+          .collection('LentTransactions')
+          .doc(paymentDocId)
+          .update({
+        'paymentConfirmed': true,
+        'status': 'confirmed',
+        'confirmedAt': FieldValue.serverTimestamp(),
+      });
+
+      print('✅ Payment confirmed successfully');
+      return true;
+    } catch (e) {
+      print('❌ Error confirming payment: $e');
+      return false;
+    }
+  }
+
+  /// Get pending payments waiting for lender confirmation
+  static Stream<List<Map<String, dynamic>>> getPendingPaymentsStream(String lenderId) {
+    return _firestore
+        .collection('Users')
+        .doc(lenderId)
+        .collection('LentTransactions')
+        .where('type', isEqualTo: 'repayment')
+        .where('paymentConfirmed', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) {
+      // Sort in memory instead of using orderBy to avoid composite index requirement
+      final docs = snapshot.docs.toList();
+      docs.sort((a, b) {
+        final aTime = (a.data()['createdAt'] as Timestamp?)?.toDate() ?? DateTime(2000);
+        final bTime = (b.data()['createdAt'] as Timestamp?)?.toDate() ?? DateTime(2000);
+        return bTime.compareTo(aTime); // Descending order (newest first)
+      });
+
+      return docs.map((doc) {
+        final data = doc.data();
+        return {
+          'docId': doc.id,
+          'recipientName': data['recipientName'] ?? 'Unknown',
+          'amount': (data['amount'] ?? 0.0).toDouble(),
+          'paymentMethod': data['paymentMethod'] ?? 'Unknown',
+          'createdAt': (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          'rawData': data,
+        };
+      }).toList();
+    });
   }
 }

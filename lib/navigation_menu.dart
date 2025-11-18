@@ -5,8 +5,9 @@ import 'package:utrack/features/app_pages/loan_page/lending_page/lending_page.da
 import 'package:utrack/utils/constants/colors.dart';
 import 'package:utrack/utils/formatters/icons.dart';
 import 'package:utrack/utils/helpers/helper_functions.dart';
-
 import 'features/app_pages/loan_page/loan_page.dart';
+import 'features/app_pages/profile_page/personalization/screens/accountScreen.dart';
+import 'features/app_pages/transacHistory_page/histroryMain.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -44,7 +45,7 @@ class NavigationController extends GetxController {
   final screens = [
     const HomePageScreen(),
     const LoanMainPage(), // This will manage Lending & Borrowing
-    Container(color: Colors.orange),
-    Container(color: Colors.red),
+    const HistoryMain(),
+    AccountScreen(),
   ];
 }

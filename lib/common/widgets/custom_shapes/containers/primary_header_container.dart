@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:utrack/utils/constants/colors.dart';
-import 'circularContainer.dart';
 import '../curved_edges/curved_edges_widget.dart';
+import 'circularContainer.dart';
 
 class UPrimaryHeaderContainer extends StatelessWidget {
   const UPrimaryHeaderContainer({
@@ -19,20 +19,24 @@ class UPrimaryHeaderContainer extends StatelessWidget {
         child: SizedBox(
           height: 400,
           width: double.infinity,
-          child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(top: -150, right: -250,
-                    child: UCircularContainer(backgroundColor: UColors.primary.withOpacity(0.1))),
-                Positioned(top: 100, right: -300,
-                    child: UCircularContainer(backgroundColor: UColors.textWhite)),
-                Positioned.fill(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: child,
+          child: Container(
+            color: UColors.primary,
+
+            child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(top: -150, right: -250,
+                      child: UCircularContainer(backgroundColor: UColors.primary.withOpacity(0.1))),
+                  Positioned(top: 100, right: -300,
+                      child: UCircularContainer(backgroundColor: UColors.textWhite)),
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: child,
+                    ),
                   ),
-                ),
-              ]
+                ]
+            ),
           ),
         ),
       ),

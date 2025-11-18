@@ -7,24 +7,26 @@ class ULogos {
   // Social Media
   static const String google = "assets/images/google.png";
   static const String facebook = "assets/images/facebook.png";
+
   static const String sendEmail = "assets/images/send_email.png";
   static const String verifyID = "assets/images/id_verify.png";
   static const String notifLogo = "assets/images/notification.png";
   static const String helpCenter = "assets/images/help_center.png";
+
 }
 
 /// Logo Sizes (for consistent scaling)
 class ULogoSizes {
   // App Logos
   static const double appLogoLarge = 150;   // For splashscreen / home (big logo)
-  static const double appLogoSmall = 40;    // For AppBar / header (small logo)
+  static const double appLogoSmall = 60;    // For AppBar / header (small logo)
 
   // Social Media
   static const double socialLogoSize = 48;  // For Google / Facebook buttons
-  static const double onBoardSize = 250;
 
   // Send Email Logo (like splashscreen size)
-  static const double sendEmailSize = 120;
+  static const double onBoardSize = 250;
+  static const double idUploadSize = 32;
 }
 
 /// Example Usage

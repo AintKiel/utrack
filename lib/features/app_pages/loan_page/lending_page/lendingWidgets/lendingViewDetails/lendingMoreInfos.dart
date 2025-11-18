@@ -186,7 +186,7 @@ class _LendingMoreInfosState extends State<LendingMoreInfos> {
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (context) => const ConfirmPaymentDialog(),
+                        builder: (context) => ConfirmPaymentDialog(borrowerId: recipientUid),
                       );
                     },
                     icon: const Icon(Icons.check_circle_outline),
