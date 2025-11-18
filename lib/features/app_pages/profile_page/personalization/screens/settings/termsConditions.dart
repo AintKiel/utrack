@@ -27,9 +27,12 @@ class TermsConditions extends StatelessWidget {
         ),
 
         body: SingleChildScrollView(
-            child: Column(
-
-          )
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Text(
+              "ako ay may tula, mahabang mahabaaaaaaaaaaaaaaaaaaaaaa"
+                        ),
+            )
         ),
     );
   }
